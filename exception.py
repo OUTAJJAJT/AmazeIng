@@ -25,6 +25,30 @@ class InvalidCoordinatesError(MazeError):
 
 class ConfigParsing:
     """Parser for maze configuration files."""
+    
+    @staticmethod
+    def parse_line(line: str) -> tuple[str, str]:
+        """Parse a key-value line, supporting = or : separators.
+
+        Args:
+            line: A configuration line.
+
+        Returns:
+            Tuple of (key, value) normalized to lowercase and stripped.
+
+        Raises:
+            ConfigError: If line format is invalid.
+        """
+        if "=" in line:
+            key, value = line.split("=", 1)
+        elif ":" in line:
+            key, value = line.split(":", 1)
+        else:
+            raise ConfigError("Invalid line format: expected '=' or ':'")
+
+        key = key.strip().lower()
+        value = value.split("#")[0].strip()
+        return key, value
 
     def parse(self, filename: str) -> Dict[str, Any]:
         """Parse configuration file and return maze parameters.
@@ -57,10 +81,12 @@ class ConfigParsing:
                     if not line or line.startswith("#"):
                         continue
 
-                    if line.startswith("WIDTH"):
-                        _, value = line.split("=")
-                        value = value.split("#")[0].strip()
+                    try:
+                        key, value = self.parse_line(line)
+                    except ConfigError:
+                        raise
 
+                    if key == "width":
                         try:
                             width = int(value)
                         except ValueError as e:
@@ -68,9 +94,7 @@ class ConfigParsing:
                                 "Width must be an integer"
                             ) from e
 
-                    elif line.startswith("HEIGHT"):
-                        _, value = line.split("=")
-                        value = value.split("#")[0].strip()
+                    elif key == "height":
                         try:
                             height = int(value)
                         except ValueError as e:
@@ -78,9 +102,7 @@ class ConfigParsing:
                                 "Height must be an integer"
                             ) from e
 
-                    elif line.startswith("ENTRY"):
-                        _, value = line.split("=")
-                        value = value.split("#")[0].strip()
+                    elif key == "entry":
                         try:
                             x, y = value.split(",")
                             entry = (int(x.strip()), int(y.strip()))
@@ -89,9 +111,7 @@ class ConfigParsing:
                                 "Entry must be in format: x,y"
                             ) from e
 
-                    elif line.startswith("EXIT"):
-                        _, value = line.split("=")
-                        value = value.split("#")[0].strip()
+                    elif key == "exit":
                         try:
                             x, y = value.split(",")
                             exit_coord = (int(x.strip()), int(y.strip()))
@@ -100,13 +120,11 @@ class ConfigParsing:
                                 "Exit must be in format: x,y"
                             ) from e
 
-                    elif line.startswith("OUTPUT_FILE"):
-                        _, value = line.split("=")
-                        output_file = value.split("#")[0].strip()
+                    elif key == "output_file":
+                        output_file = value
 
-                    elif line.startswith("ALGORITHM"):
-                        _, value = line.split("=")
-                        algorithm = value.split("#")[0].strip()
+                    elif key == "algorithm":
+                        algorithm = value
 
         except FileNotFoundError as e:
             raise ConfigError(f"Config file '{filename}' not found") from e
@@ -131,7 +149,6 @@ class ConfigParsing:
             raise InvalidDimensionsError(f"Height must be positive, got\
 {height}")
 
-        # Validate dimensions are not too large
         max_dimension: int = 1000
         if width > max_dimension:
             raise InvalidDimensionsError(
@@ -141,7 +158,6 @@ class ConfigParsing:
             raise InvalidDimensionsError(
                 f"Height too large (max {max_dimension}), got {height}"
             )
-        # Validate coordinates are within bounds
         entry_x, entry_y = entry
         exit_x, exit_y = exit_coord
 
@@ -152,7 +168,6 @@ class ConfigParsing:
             raise InvalidCoordinatesError(f"Exit {exit_coord} is out of bounds\
  (0-{width - 1}, 0-{height - 1})")
 
-        # Validate entry and exit are different
         if entry == exit_coord:
             raise InvalidCoordinatesError("Entry and exit cannot be the same")
 

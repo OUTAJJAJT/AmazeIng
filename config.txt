@@ -1,17 +1,17 @@
 # Maze configuration file
 # Lines starting with '#' are comments
 
-WIDTH:20   # Maze width (number of cells)
+WIDTH=20   # Maze width (number of cells)
 HEIGHT=25  # Maze height (number of cells)
 
 ENTRY=0,0  # Coordinates of maze entrance (x,y)
-ExiT:18,24   # Coordinates of maze exit (x,y)
+EXIT=18,24   # Coordinates of maze exit (x,y)
 
-OUTPUT_file:maze.txt   # Output file name
+OUTPUT_file=maze.txt   # Output file name
 
-PErFeCT:True       # Whether the maze is perfect (only one path from ENTRY to EXIT)
+PErFeCT=True       # Whether the maze is perfect (only one path from ENTRY to EXIT)
 
 # Optional keys
-SEED=42         # Random seed for reproducibility
+SEED=42      # Random seed for reproducibility
 ALGORITHM=recursive_backtracker      # Maze generation algorithm: dfs, prim, recursive_backtracker
 DISPLAY_MODE=mlx # Display mode: MLX

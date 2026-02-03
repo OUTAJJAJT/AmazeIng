@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Custom exceptions for the AmazeIng maze generator."""
 
 from typing import Any, Dict, Tuple
@@ -41,10 +43,8 @@ class ConfigParsing:
         """
         if "=" in line:
             key, value = line.split("=", 1)
-        elif ":" in line:
-            key, value = line.split(":", 1)
         else:
-            raise ConfigError("Invalid line format: expected '=' or ':'")
+            raise ConfigError("Invalid line format: expected '='")
 
         key = key.strip().lower()
         value = value.split("#")[0].strip()
@@ -129,7 +129,6 @@ class ConfigParsing:
         except FileNotFoundError as e:
             raise ConfigError(f"Config file '{filename}' not found") from e
 
-        # Validate all required fields are present
         if width is None:
             raise InvalidDimensionsError("Width not found in config file")
         if height is None:
@@ -141,7 +140,6 @@ class ConfigParsing:
         if output_file is None:
             raise InvalidDimensionsError("Output file not found in config file"
                                          )
-        # Validate dimensions are positive
         if width <= 0:
             raise InvalidDimensionsError(f"Width must be positive, got {width}"
                                          )

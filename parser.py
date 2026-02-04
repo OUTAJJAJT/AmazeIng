@@ -27,9 +27,8 @@ class InvalidCoordinatesError(MazeError):
 
 class ConfigParsing:
     """Parser for maze configuration files."""
-    
-    @staticmethod
-    def parse_line(line: str) -> tuple[str, str]:
+
+    def parse_line(self, line: str) -> tuple[str, str]:
         """Parse a key-value line, supporting = or : separators.
 
         Args:

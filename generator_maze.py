@@ -9,14 +9,6 @@ from pathfinding import find_path
 # Increase recursion limit for large mazes
 sys.setrecursionlimit(100000)
 
-# Color schemes: (wall_color, path_color, solution_color)
-# COLOR_SCHEMES = {
-#     0: ("\033[31m", "\033[32m", "\033[33m"),  # Red/Green/Yellow
-#     1: ("\033[34m", "\033[33m", "\033[35m"),  # Blue/Yellow/Magenta
-#     2: ("\033[35m", "\033[36m", "\033[31m"),  # Magenta/Cyan/Red
-#     3: ("\033[37m", "\033[30m", "\033[36m")   # White/Black/Cyan
-# }
-
 
 def get_opposite(direction: str) -> str:
     """Get the opposite direction.
@@ -57,12 +49,10 @@ def carve_passages(grid: list[list[dict]], row: int, col: int,
         if neighbor is not None:
             new_row, new_col = neighbor
             if not grid[new_row][new_col]["visited"]:
-                # Remove wall between current and neighbor
                 grid[row][col][direction] = False
                 opposite = get_opposite(direction)
                 grid[new_row][new_col][opposite] = False
 
-                # Recursively carve from neighbor
                 carve_passages(grid, new_row, new_col, width, height)
 
 
@@ -172,71 +162,8 @@ def main() -> None:
     grid = create_grid(width, height)
     generate_maze(grid, width, height, entry)
 
-#     # Interactive color selection
-#     current_color_scheme = 0
-#     wall_color, path_color, solution_color = COLOR_SCHEMES[
-#         current_color_scheme
-#     ]
-
-    # Find solution path
     exit_row, exit_col = config["exit"]
     find_path(grid, entry, (exit_row, exit_col))
-    # solution_path = find_path(grid, entry, (exit_row, exit_col))
-
-#     print("\n=== Maze Color Schemes ===")
-#     print("0: Red walls, Green paths")
-#     print("1: Blue walls, Yellow paths")
-#     print("2: Magenta walls, Cyan paths")
-#     print("3: White walls, Black paths")
-#     print("\nCommands:")
-#     print("  'c' - Next color scheme")
-#     print("  'p' - Previous color scheme")
-#     print("  's' - Show solution path")
-#     print("  'q' - Quit\n")
-
-#     show_solution = False
-
-#     while True:
-#         if show_solution and solution_path:
-#             display_maze_with_path(
-#                 grid,
-#                 solution_path,
-#                 wall_color,
-#                 path_color,
-#                 solution_color,
-#             )
-#         else:
-#             display_maze(grid, wall_color, path_color)
-
-#         user_input = input("\nCommand (c=next, p=previous, s=solution, \
-# q=quit): ").strip().lower()
-
-#         if user_input == 'c':
-#             current_color_scheme = (current_color_scheme + 1) % \
-#                 len(COLOR_SCHEMES)
-#             wall_color, path_color, solution_color = COLOR_SCHEMES[
-#                 current_color_scheme
-#             ]
-#             print(f"Switched to scheme {current_color_scheme}")
-#         elif user_input == 'p':
-#             current_color_scheme = (current_color_scheme - 1) % \
-#                 len(COLOR_SCHEMES)
-#             wall_color, path_color, solution_color = COLOR_SCHEMES[
-#                 current_color_scheme
-#             ]
-#             print(f"Switched to scheme {current_color_scheme}")
-#         elif user_input == 's':
-#             if solution_path:
-#                 show_solution = not show_solution
-#                 status = "ON" if show_solution else "OFF"
-#                 print(f"Solution display: {status}")
-#             else:
-#                 print("No solution found!")
-#         elif user_input == 'q':
-#             print("Goodbye!")
-#             break
-#         else:
-#             print("Invalid command. Use 'c', 'p', 's', or 'q'")
 
 
 if __name__ == "__main__":

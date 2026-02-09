@@ -60,50 +60,6 @@ def find_path(grid: list[list[dict]], start: tuple[int, int],
     return None
 
 
-# def display_maze_with_path(grid: list[list[dict]], path:
-#                            list[tuple[int, int]], wall_color:
-#                            str = "\033[31m", path_color:
-#                            str = "\033[32m", solution_color:
-#                            str = "\033[33m") -> None:
-#     """Display maze with solution path highlighted."""
-#     height = len(grid)
-#     width = len(grid[0])
-#     reset = "\033[0m"
-
-#     path_set = set(path)
-
-#     print(" " + wall_color + "_" * (width * 2 - 1) + reset)
-
-#     for row in range(height):
-#         line = wall_color + "|" + reset
-#         for col in range(width):
-#             cell = grid[row][col]
-
-#             # Use * for solution path, space for regular
-#             is_on_path = (row, col) in path_set
-
-#             if cell["bottom"]:
-#                 bottom_char = "_"
-#             else:
-#                 bottom_char = "*" if is_on_path else " "
-
-#             if is_on_path and not cell["bottom"]:
-#                 line += solution_color + bottom_char + reset
-#             elif cell["bottom"]:
-#                 line += wall_color + bottom_char + reset
-#             else:
-#                 line += path_color + bottom_char + reset
-
-#             if cell["right"]:
-#                 line += wall_color + "|" + reset
-#             else:
-#                 right_char = "*" if is_on_path else " "
-#                 line += solution_color + right_char + reset if is_on_path \
-#                     else path_color + right_char + reset
-
-#         print(line)
-
-
 if __name__ == "__main__":
     from generator_maze import create_grid, generate_maze
     from parser import ConfigParsing
@@ -121,12 +77,3 @@ if __name__ == "__main__":
     generate_maze(grid, width, height, entry)
 
     path = find_path(grid, entry, goal)
-
-    # if path:
-    #     print(f"✓ Path found! Length: {len(path)} steps")
-    #     print(f"  Start: {entry}")
-    #     print(f"  Goal: {goal}")
-    #     print("\nMaze with solution (yellow):")
-    #     display_maze_with_path(grid, path)
-    # else:
-    #     print("✗ No path found!")

@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 
-import random
-import sys
-# from typing import Any
 from parser import ConfigParsing
 from pathfinding import find_path
-
-# Increase recursion limit for large mazes
+import random
+import sys
 sys.setrecursionlimit(100000)
 
 
@@ -70,47 +67,77 @@ def generate_maze(grid: list[list[dict]], width: int, height: int,
     carve_passages(grid, entry_row, entry_col, width, height)
 
 
-def display_maze(grid: list[list[dict]], wall_color: str = "\033[31m",
-                 path_color: str = "\033[32m") -> None:
-    """Display the maze as ASCII art with ANSI colors.
+def can_remove_wall(grid, row, col, direction, width, height):
 
-    Args:
-        grid: The maze grid.
-        wall_color: ANSI color code for walls (default red).
-        path_color: ANSI color code for paths (default green).
-    """
-    height = len(grid)
-    width = len(grid[0])
+    if row == 0 and direction == "top":
+        return False
+    if row == height - 1 and direction == "bottom":
+        return False
+    if col == 0 and direction == "left":
+        return False
+    if col == width - 1 and direction == "right":
+        return False
 
-    reset = "\033[0m"
+    if not grid[row][col][direction]:
+        return False
 
-    print(" " + wall_color + "_" * (width * 2 - 1) + reset)
+    neighbor = get_neighbor(row, col, direction, width, height)
+    if neighbor is None:
+        return False
 
-    for row in range(height):
-        line = wall_color + "|" + reset
-        for col in range(width):
-            cell = grid[row][col]
+    n_row, n_col = neighbor
 
-            if cell["bottom"]:
-                line += wall_color + "_" + reset
-            else:
-                line += path_color + " " + reset
+    if grid[row][col].get("pattern", False):
+        return False
+    if grid[n_row][n_col].get("pattern", False):
+        return False
 
-            if cell["right"]:
-                line += wall_color + "|" + reset
-            else:
-                line += path_color + " " + reset
+    return True
 
-        print(line)
+
+def make_imperfect(grid, width, height, removal_percentage):
+
+    total_cells = width + height
+
+    # Safer wall removal amount
+    walls_to_remove = max(1, int((total_cells) * removal_percentage))
+
+    removed = 0
+    attempts = 0
+    max_attempts = walls_to_remove * 30
+
+    directions = ["top", "right", "bottom", "left"]
+
+    while removed < walls_to_remove and attempts < max_attempts:
+        attempts += 1
+
+        row = random.randint(0, height - 1)
+        col = random.randint(0, width - 1)
+        direction = random.choice(directions)
+
+        if not grid[row][col][direction]:  # skip if already removed
+            continue
+
+        if not can_remove_wall(grid, row, col, direction, width, height):
+            continue
+
+        neighbor = get_neighbor(row, col, direction, width, height)
+
+        if not neighbor:
+            continue
+
+        n_row, n_col = neighbor
+        opposite = get_opposite(direction)
+
+        grid[row][col][direction] = False
+        grid[n_row][n_col][opposite] = False
+
+        removed += 1
+
+    return removed
 
 
 def is_valid(row: int, col: int, width: int, height: int) -> bool:
-    # valid = 0
-    # if (0 <= row < height) and (0 <= col < width):
-    #     valid = 1
-    # if valid == 0:
-    #     return 0
-    # return 1
     return 0 <= row < height and 0 <= col < width
 
 
@@ -134,9 +161,9 @@ def get_neighbor(row: int, col: int, direction: str,
 def create_grid(width: int, height: int) -> list[list[dict]]:
     grid = []
 
-    for row in range(height):
+    for _ in range(height):
         row_cells = []
-        for col in range(width):
+        for _ in range(width):
             cell = {
                 "top": True,
                 "right": True,
@@ -145,10 +172,48 @@ def create_grid(width: int, height: int) -> list[list[dict]]:
                 "visited": False
             }
             row_cells.append(cell)
-
         grid.append(row_cells)
-
     return grid
+
+
+def add_pattern_42(grid: list[list[dict]], width: int, height: int) -> None:
+    """Add ASCII pattern '42' as blocked cells in the maze center.
+
+    Args:
+        grid: The maze grid.
+        width: Maze width.
+        height: Maze height.
+    """
+    pattern = [
+        "#   ###",
+        "#     #",
+        "### ###",
+        "  # #  ",
+        "  # ###"
+    ]
+
+    pattern_height = len(pattern)
+    pattern_width = len(pattern[0])
+
+    if width < pattern_width or height < pattern_height:
+        return
+
+    start_row = (height - pattern_height) // 2
+    start_col = (width - pattern_width) // 2
+
+    for p_row, line in enumerate(pattern):
+        for p_col, char in enumerate(line):
+            if char == '#':
+                grid_row = start_row + p_row
+                grid_col = start_col + p_col
+
+                if grid_row < height and grid_col < width:
+                    grid[grid_row][grid_col]["top"] = True
+                    grid[grid_row][grid_col]["right"] = True
+                    grid[grid_row][grid_col]["bottom"] = True
+                    grid[grid_row][grid_col]["left"] = True
+                    grid[grid_row][grid_col]["visited"] = True
+                    grid[grid_row][grid_col]["pattern"] = True
 
 
 def main() -> None:
@@ -158,13 +223,22 @@ def main() -> None:
     width = config["width"]
     height = config["height"]
     entry = config["entry"]
+    perfect = config["perfect"]
+    imperfect_percentage = float(config.get("imperfect_percentage", 0.20))
 
     grid = create_grid(width, height)
+    if height >= 5 and width >= 7:
+        add_pattern_42(grid, width, height)
     generate_maze(grid, width, height, entry)
+
+    if not perfect:
+        walls_removed = make_imperfect(grid, width, height,
+                                       imperfect_percentage)
+        print(f"🔧 Made imperfect: Removed {walls_removed} walls to create \
+alternate paths")
 
     exit_row, exit_col = config["exit"]
     find_path(grid, entry, (exit_row, exit_col))
 
 
-if __name__ == "__main__":
-    main()
+main()

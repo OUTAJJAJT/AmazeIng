@@ -70,6 +70,8 @@ class ConfigParsing:
         exit_coord: Tuple[int, int] | None = None
         output_file: str | None = None
         algorithm: str = "recursive_backtracking"
+        perfect: bool = True
+        imperfect_percentage: float = 0.30
 
         try:
             with open(filename, "r") as file:
@@ -125,6 +127,15 @@ class ConfigParsing:
                     elif key == "algorithm":
                         algorithm = value
 
+                    elif key == "perfect":
+                        perfect = value.lower() in ("true", "1", "yes")
+
+                    elif key == "imperfect_percentage":
+                        try:
+                            imperfect_percentage = float(value)
+                        except ValueError:
+                            imperfect_percentage = 0.30
+
         except FileNotFoundError as e:
             raise ConfigError(f"Config file '{filename}' not found") from e
 
@@ -175,20 +186,21 @@ class ConfigParsing:
             "exit": exit_coord,
             "output_file": output_file,
             "algorithm": algorithm,
+            "perfect": perfect,
+            "imperfect_percentage": imperfect_percentage,
         }
 
 
-if __name__ == "__main__":
-    parser: ConfigParsing = ConfigParsing()
+parser: ConfigParsing = ConfigParsing()
 
-    try:
-        config: Dict[str, Any] = parser.parse("config.txt")
-        print("Configuration loaded successfully!")
-        print(f"Width: {config['width']}")
-        print(f"Height: {config['height']}")
-        print(f"Entry: {config['entry']}")
-        print(f"Exit: {config['exit']}")
-        print(f"Output file: {config['output_file']}")
-        print(f"Algorithm: {config['algorithm']}")
-    except MazeError as e:
-        print(f"Error: {e}")
+try:
+    config: Dict[str, Any] = parser.parse("config.txt")
+    print("Configuration loaded successfully!")
+    print(f"Width: {config['width']}")
+    print(f"Height: {config['height']}")
+    print(f"Entry: {config['entry']}")
+    print(f"Exit: {config['exit']}")
+    print(f"Output file: {config['output_file']}")
+    print(f"Algorithm: {config['algorithm']}")
+except MazeError as e:
+    print(f"Error: {e}")

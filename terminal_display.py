@@ -27,29 +27,29 @@ class TerminalDisplay:
             for x in range(self.width):
                 cell = self.maze[y][x]
                 if cell & 1:
-                    top += self.wall_color + '+---' + self.RESET
+                    top += self.wall_color + '█████' + self.RESET
                 else:
-                    top += self.wall_color + '+   ' + self.RESET
-            top += self.wall_color + '+' + self.RESET
+                    top += self.wall_color + '█' + self.RESET + '    '
+            top += self.wall_color + '█' + self.RESET
             output.append(top)
 
             middle = ''
             for x in range(self.width):
                 cell = self.maze[y][x]
                 if cell & 8:
-                    middle += self.wall_color + '|' + self.RESET
+                    middle += self.wall_color + '█' + self.RESET
                 else:
                     middle += ' '
                 if (x, y) == self.entry:
-                    middle += self.GREEN + ' E ' + self.RESET
+                    middle += self.GREEN + ' E  ' + self.RESET
                 elif (x, y) == self.exit:
-                    middle += self.RED + ' X ' + self.RESET
+                    middle += self.RED + ' X  ' + self.RESET
                 elif self.show_path and (x, y) in self.path_cells:
-                    middle += self.YELLOW + ' . ' + self.RESET
+                    middle += self.YELLOW + ' ●  ' + self.RESET
                 else:
-                    middle += '   '
+                    middle += '    '
             if self.maze[y][self.width - 1] & 2:
-                middle += self.wall_color + '|' + self.RESET
+                middle += self.wall_color + '█' + self.RESET
             else:
                 middle += ' '
             output.append(middle)
@@ -58,10 +58,10 @@ class TerminalDisplay:
         for x in range(self.width):
             cell = self.maze[self.height - 1][x]
             if cell & 4:
-                bottom += self.wall_color + '+---' + self.RESET
+                bottom += self.wall_color + '█████' + self.RESET
             else:
-                bottom += self.wall_color + '+   ' + self.RESET
-        bottom += self.wall_color + '+' + self.RESET
+                bottom += self.wall_color + '█' + self.RESET + '    '
+        bottom += self.wall_color + '█' + self.RESET
         output.append(bottom)
 
         return '\n'.join(output)

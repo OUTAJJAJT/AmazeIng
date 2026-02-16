@@ -1,6 +1,8 @@
 import sys
 from config_parser import ConfigParser
 from terminal_display import TerminalDisplay
+from generator_maze import create_grid, generate_maze, add_pattern_42
+from pathfinding import find_path
 
 
 def get_key():
@@ -16,6 +18,43 @@ def get_key():
     return key
 
 
+def grid_to_maze(grid):
+    maze = []
+    for row in grid:
+        maze_row = []
+        for cell in row:
+            value = 0
+            if cell["top"]:
+                value += 1
+            if cell["right"]:
+                value += 2
+            if cell["bottom"]:
+                value += 4
+            if cell["left"]:
+                value += 8
+            maze_row.append(value)
+        maze.append(maze_row)
+    return maze
+
+
+def path_to_directions(path):
+    if not path or len(path) < 2:
+        return []
+    directions = []
+    for i in range(len(path) - 1):
+        r1, c1 = path[i]
+        r2, c2 = path[i + 1]
+        if r2 < r1:
+            directions.append('N')
+        elif r2 > r1:
+            directions.append('S')
+        elif c2 > c1:
+            directions.append('E')
+        elif c2 < c1:
+            directions.append('W')
+    return directions
+
+
 def main():
     if len(sys.argv) != 2:
         print("Usage: python3 a_maze_ing.py config.txt")
@@ -29,15 +68,26 @@ def main():
     entry  = parser.get_coords('ENTRY')
     exit   = parser.get_coords('EXIT')
 
-    # temporary fake maze until partner is done
-    maze = make_fake_maze(width, height)
+    # entry and exit are (x,y) but partner uses (row,col)
+    entry_rc = (entry[1], entry[0])
+    exit_rc  = (exit[1],  exit[0])
+
+    grid = create_grid(width, height)
+    if height >= 5 and width >= 7:
+        add_pattern_42(grid, width, height)
+    generate_maze(grid, width, height, entry_rc)
+
+    raw_path = find_path(grid, entry_rc, exit_rc)
+    directions = path_to_directions(raw_path)
+
+    maze = grid_to_maze(grid)
 
     display = TerminalDisplay(maze, entry, exit)
+    display.set_path(directions)
 
     while True:
         display.display()
         key = get_key()
-
         if key == 'q':
             print("Bye!")
             break
@@ -45,26 +95,16 @@ def main():
             display.toggle_path()
         elif key == 'c':
             display.cycle_wall_color()
-
-
-def make_fake_maze(width, height):
-    import random
-    maze = []
-    for y in range(height):
-        row = []
-        for x in range(width):
-            cell = 0xF
-            if x > 0:
-                cell &= ~8
-            if x < width - 1:
-                cell &= ~2
-            if y > 0:
-                cell &= ~1
-            if y < height - 1:
-                cell &= ~4
-            row.append(cell)
-        maze.append(row)
-    return maze
+        elif key == 'r':
+            grid = create_grid(width, height)
+            if height >= 5 and width >= 7:
+                add_pattern_42(grid, width, height)
+            generate_maze(grid, width, height, entry_rc)
+            raw_path = find_path(grid, entry_rc, exit_rc)
+            directions = path_to_directions(raw_path)
+            maze = grid_to_maze(grid)
+            display.maze = maze
+            display.set_path(directions)
 
 
 main()

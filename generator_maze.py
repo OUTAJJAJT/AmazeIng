@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-from parser import ConfigParsing
-from pathfinding import find_path
+
 import random
 import sys
 sys.setrecursionlimit(100000)
@@ -214,31 +213,3 @@ def add_pattern_42(grid: list[list[dict]], width: int, height: int) -> None:
                     grid[grid_row][grid_col]["left"] = True
                     grid[grid_row][grid_col]["visited"] = True
                     grid[grid_row][grid_col]["pattern"] = True
-
-
-def main() -> None:
-    parser = ConfigParsing()
-    config = parser.parse("config.txt")
-
-    width = config["width"]
-    height = config["height"]
-    entry = config["entry"]
-    perfect = config["perfect"]
-    imperfect_percentage = float(config.get("imperfect_percentage", 0.20))
-
-    grid = create_grid(width, height)
-    if height >= 5 and width >= 7:
-        add_pattern_42(grid, width, height)
-    generate_maze(grid, width, height, entry)
-
-    if not perfect:
-        walls_removed = make_imperfect(grid, width, height,
-                                       imperfect_percentage)
-        print(f"🔧 Made imperfect: Removed {walls_removed} walls to create \
-alternate paths")
-
-    exit_row, exit_col = config["exit"]
-    find_path(grid, entry, (exit_row, exit_col))
-
-
-main()

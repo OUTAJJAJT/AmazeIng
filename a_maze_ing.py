@@ -6,16 +6,8 @@ from pathfinding import find_path
 
 
 def get_key():
-    import tty
-    import termios
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        key = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-    return key
+    key = input()
+    return key.strip()
 
 
 def grid_to_maze(grid):
@@ -35,6 +27,15 @@ def grid_to_maze(grid):
             maze_row.append(value)
         maze.append(maze_row)
     return maze
+
+
+def get_pattern_cells(grid):
+    pattern = set()
+    for r, row in enumerate(grid):
+        for c, cell in enumerate(row):
+            if cell.get("pattern", False):
+                pattern.add((c, r))
+    return pattern
 
 
 def path_to_directions(path):
@@ -68,7 +69,6 @@ def main():
     entry  = parser.get_coords('ENTRY')
     exit   = parser.get_coords('EXIT')
 
-    # entry and exit are (x,y) but partner uses (row,col)
     entry_rc = (entry[1], entry[0])
     exit_rc  = (exit[1],  exit[0])
 
@@ -77,25 +77,26 @@ def main():
         add_pattern_42(grid, width, height)
     generate_maze(grid, width, height, entry_rc)
 
-    raw_path = find_path(grid, entry_rc, exit_rc)
+    raw_path   = find_path(grid, entry_rc, exit_rc)
     directions = path_to_directions(raw_path)
+    maze       = grid_to_maze(grid)
 
-    maze = grid_to_maze(grid)
-
-    display = TerminalDisplay(maze, entry, exit)
+    pattern_cells = get_pattern_cells(grid)
+    display = TerminalDisplay(maze, entry, exit, pattern_cells)
     display.set_path(directions)
 
     while True:
         display.display()
         key = get_key()
-        if key == 'q':
+
+        if key == '4':
             print("Bye!")
             break
-        elif key == 'p':
+        elif key == '1':
             display.toggle_path()
-        elif key == 'c':
+        elif key == '2':
             display.cycle_wall_color()
-        elif key == 'r':
+        elif key == '3':
             grid = create_grid(width, height)
             if height >= 5 and width >= 7:
                 add_pattern_42(grid, width, height)
@@ -103,8 +104,12 @@ def main():
             raw_path = find_path(grid, entry_rc, exit_rc)
             directions = path_to_directions(raw_path)
             maze = grid_to_maze(grid)
+            pattern_cells = get_pattern_cells(grid)
             display.maze = maze
+            display.pattern_cells = pattern_cells
             display.set_path(directions)
+        else:
+            print("Invalid choice! Enter 1, 2, 3 or 4")
 
 
 main()

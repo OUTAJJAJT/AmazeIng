@@ -90,6 +90,7 @@ def main():
         key = get_key()
 
         if key == '4':
+            print('\033[2J\033[H', end='')
             print("Bye!")
             break
         elif key == '1':

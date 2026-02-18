@@ -75,7 +75,8 @@ class TerminalDisplay:
         return '\n'.join(output)
 
     def display(self):
-        print('\033[H\033[2J', end='', flush=True)
+        import os
+        os.system('clear' if os.name == 'posix' else 'cls')
         print(self.render(), flush=True)
         print()
         print(self.YELLOW + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)

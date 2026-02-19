@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+
 import random
-# from typing import Any
-from parser import ConfigParsing
+import sys
+sys.setrecursionlimit(100000)
 
 
 def get_opposite(direction: str) -> str:
@@ -41,16 +42,13 @@ def carve_passages(grid: list[list[dict]], row: int, col: int,
 
     for direction in directions:
         neighbor = get_neighbor(row, col, direction, width, height)
-
         if neighbor is not None:
             new_row, new_col = neighbor
             if not grid[new_row][new_col]["visited"]:
-                # Remove wall between current and neighbor
                 grid[row][col][direction] = False
                 opposite = get_opposite(direction)
                 grid[new_row][new_col][opposite] = False
 
-                # Recursively carve from neighbor
                 carve_passages(grid, new_row, new_col, width, height)
 
 
@@ -68,46 +66,82 @@ def generate_maze(grid: list[list[dict]], width: int, height: int,
     carve_passages(grid, entry_row, entry_col, width, height)
 
 
-def display_maze(grid: list[list[dict]]) -> None:
-    """Display the maze as ASCII art.
+def can_remove_wall(grid, row, col, direction, width, height):
 
-    Args:
-        grid: The maze grid.
-    """
-    height = len(grid)
-    width = len(grid[0])
+    if row == 0 and direction == "top":
+        return False
+    if row == height - 1 and direction == "bottom":
+        return False
+    if col == 0 and direction == "left":
+        return False
+    if col == width - 1 and direction == "right":
+        return False
 
-    print(" " + "_" * (width * 2 - 1))
+    if not grid[row][col][direction]:
+        return False
 
-    for row in range(height):
-        line = "|"
-        for col in range(width):
-            cell = grid[row][col]
+    neighbor = get_neighbor(row, col, direction, width, height)
+    if neighbor is None:
+        return False
 
-            if cell["bottom"]:
-                line += "_"
-            else:
-                line += " "
+    n_row, n_col = neighbor
 
-            if cell["right"]:
-                line += "|"
-            else:
-                line += " "
+    if grid[row][col].get("pattern", False):
+        return False
+    if grid[n_row][n_col].get("pattern", False):
+        return False
 
-        print(line)
+    return True
+
+
+def make_imperfect(grid, width, height, removal_percentage):
+
+    total_cells = width + height
+
+    # Safer wall removal amount
+    walls_to_remove = max(1, int((total_cells) * removal_percentage))
+
+    removed = 0
+    attempts = 0
+    max_attempts = walls_to_remove * 30
+
+    directions = ["top", "right", "bottom", "left"]
+
+    while removed < walls_to_remove and attempts < max_attempts:
+        attempts += 1
+
+        row = random.randint(0, height - 1)
+        col = random.randint(0, width - 1)
+        direction = random.choice(directions)
+
+        if not grid[row][col][direction]:  # skip if already removed
+            continue
+
+        if not can_remove_wall(grid, row, col, direction, width, height):
+            continue
+
+        neighbor = get_neighbor(row, col, direction, width, height)
+
+        if not neighbor:
+            continue
+
+        n_row, n_col = neighbor
+        opposite = get_opposite(direction)
+
+        grid[row][col][direction] = False
+        grid[n_row][n_col][opposite] = False
+
+        removed += 1
+
+    return removed
 
 
 def is_valid(row: int, col: int, width: int, height: int) -> bool:
-    valid = 0
-    if (0 <= row < height) and (0 <= col < width):
-        valid = 1
-    if valid == 0:
-        return 0
-    return 1
+    return 0 <= row < height and 0 <= col < width
 
 
-def get_neighbor(row: int, col: int, height: int, width: int, direction: str) \
-                        -> tuple[int, int] | None:
+def get_neighbor(row: int, col: int, direction: str,
+                 width: int, height: int) -> tuple[int, int] | None:
     if direction == "top":
         new_row, new_col = row - 1, col
     elif direction == "right":
@@ -126,9 +160,9 @@ def get_neighbor(row: int, col: int, height: int, width: int, direction: str) \
 def create_grid(width: int, height: int) -> list[list[dict]]:
     grid = []
 
-    for row in range(height):
+    for _ in range(height):
         row_cells = []
-        for col in range(width):
+        for _ in range(width):
             cell = {
                 "top": True,
                 "right": True,
@@ -137,24 +171,45 @@ def create_grid(width: int, height: int) -> list[list[dict]]:
                 "visited": False
             }
             row_cells.append(cell)
-
         grid.append(row_cells)
-
     return grid
 
 
-def main() -> None:
-    parser = ConfigParsing()
-    config = parser.parse("config.txt")
+def add_pattern_42(grid: list[list[dict]], width: int, height: int) -> None:
+    """Add ASCII pattern '42' as blocked cells in the maze center.
 
-    width = config["width"]
-    height = config["height"]
-    entry = config["entry"]  # Add this line
+    Args:
+        grid: The maze grid.
+        width: Maze width.
+        height: Maze height.
+    """
+    pattern = [
+        "#   ###",
+        "#     #",
+        "### ###",
+        "  # #  ",
+        "  # ###"
+    ]
 
-    grid = create_grid(width, height)
-    generate_maze(grid, width, height, entry)
-    display_maze(grid)
+    pattern_height = len(pattern)
+    pattern_width = len(pattern[0])
 
+    if width < pattern_width or height < pattern_height:
+        return
 
-if __name__ == "__main__":
-    main()
+    start_row = (height - pattern_height) // 2
+    start_col = (width - pattern_width) // 2
+
+    for p_row, line in enumerate(pattern):
+        for p_col, char in enumerate(line):
+            if char == '#':
+                grid_row = start_row + p_row
+                grid_col = start_col + p_col
+
+                if grid_row < height and grid_col < width:
+                    grid[grid_row][grid_col]["top"] = True
+                    grid[grid_row][grid_col]["right"] = True
+                    grid[grid_row][grid_col]["bottom"] = True
+                    grid[grid_row][grid_col]["left"] = True
+                    grid[grid_row][grid_col]["visited"] = True
+                    grid[grid_row][grid_col]["pattern"] = True

@@ -75,6 +75,7 @@ def main():
     seed = config["seed"]
     filename = config["output_file"]
 
+    print(seed)
     if seed is not None:
         random.seed(seed)
     grid = create_grid(width, height)

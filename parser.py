@@ -132,7 +132,7 @@ class ConfigParsing:
 
                     elif key == "seed":
                         try:
-                            seed = int(value)
+                            seed = (value)
                         except ValueError as e:
                             raise InvalidDimensionsError(
                                 "seed must be an integer"

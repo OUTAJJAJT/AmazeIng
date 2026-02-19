@@ -27,8 +27,9 @@ class InvalidCoordinatesError(MazeError):
 
 class ConfigParsing:
     """Parser for maze configuration files."""
-
-    def parse_line(self, line: str) -> tuple[str, str]:
+    
+    @staticmethod
+    def parse_line(line: str) -> tuple[str, str]:
         """Parse a key-value line, supporting = or : separators.
 
         Args:
@@ -70,8 +71,6 @@ class ConfigParsing:
         exit_coord: Tuple[int, int] | None = None
         output_file: str | None = None
         algorithm: str = "recursive_backtracking"
-        perfect: bool = True
-        seed: int | None = None
 
         try:
             with open(filename, "r") as file:
@@ -127,17 +126,6 @@ class ConfigParsing:
                     elif key == "algorithm":
                         algorithm = value
 
-                    elif key == "perfect":
-                        perfect = value.lower() in ("true", "1", "yes")
-
-                    elif key == "seed":
-                        try:
-                            seed = (value)
-                        except ValueError as e:
-                            raise InvalidDimensionsError(
-                                "seed must be an integer"
-                            ) from e
-
         except FileNotFoundError as e:
             raise ConfigError(f"Config file '{filename}' not found") from e
 
@@ -151,9 +139,6 @@ class ConfigParsing:
             raise InvalidCoordinatesError("Exit not found in config file")
         if output_file is None:
             raise InvalidDimensionsError("Output file not found in config file"
-                                         )
-        if seed is None:
-            raise InvalidDimensionsError("seed not found in config file"
                                          )
         if width <= 0:
             raise InvalidDimensionsError(f"Width must be positive, got {width}"
@@ -191,21 +176,20 @@ class ConfigParsing:
             "exit": exit_coord,
             "output_file": output_file,
             "algorithm": algorithm,
-            "perfect": perfect,
-            "seed": seed
         }
 
 
-parser: ConfigParsing = ConfigParsing()
+if __name__ == "__main__":
+    parser: ConfigParsing = ConfigParsing()
 
-try:
-    config: Dict[str, Any] = parser.parse("config.txt")
-    print("Configuration loaded successfully!")
-    print(f"Width: {config['width']}")
-    print(f"Height: {config['height']}")
-    print(f"Entry: {config['entry']}")
-    print(f"Exit: {config['exit']}")
-    print(f"Output file: {config['output_file']}")
-    print(f"Algorithm: {config['algorithm']}")
-except MazeError as e:
-    print(f"Error: {e}")
+    try:
+        config: Dict[str, Any] = parser.parse("config.txt")
+        print("Configuration loaded successfully!")
+        print(f"Width: {config['width']}")
+        print(f"Height: {config['height']}")
+        print(f"Entry: {config['entry']}")
+        print(f"Exit: {config['exit']}")
+        print(f"Output file: {config['output_file']}")
+        print(f"Algorithm: {config['algorithm']}")
+    except MazeError as e:
+        print(f"Error: {e}")

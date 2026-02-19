@@ -10,16 +10,8 @@ from output_hex import save_maze
 
 
 def get_key():
-    import tty
-    import termios
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        key = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-    return key
+    key = input()
+    return key.strip()
 
 
 def grid_to_maze(grid):
@@ -39,6 +31,15 @@ def grid_to_maze(grid):
             maze_row.append(value)
         maze.append(maze_row)
     return maze
+
+
+def get_pattern_cells(grid):
+    pattern = set()
+    for r, row in enumerate(grid):
+        for c, cell in enumerate(row):
+            if cell.get("pattern", False):
+                pattern.add((c, r))
+    return pattern
 
 
 def path_to_directions(path):
@@ -81,8 +82,8 @@ def main():
     grid = create_grid(width, height)
     if height >= 5 and width >= 7:
         add_pattern_42(grid, width, height)
-
     generate_maze(grid, width, height, entry)
+
     if not perfect:
         make_imperfect(grid, width, height, 0.2)
     raw_path = find_path(grid, entry, exit)
@@ -90,21 +91,24 @@ def main():
 
     maze = grid_to_maze(grid)
 
-    display = TerminalDisplay(maze, entry, exit)
+    pattern_cells = get_pattern_cells(grid)
+    display = TerminalDisplay(maze, entry, exit, pattern_cells)
     display.set_path(directions)
     save_maze(grid, entry, exit, raw_path, filename)
 
     while True:
         display.display()
         key = get_key()
-        if key == 'q':
+
+        if key == '4':
+            print('\033[2J\033[H', end='')
             print("Bye!")
             break
-        elif key == 'p':
+        elif key == '1':
             display.toggle_path()
-        elif key == 'c':
+        elif key == '2':
             display.cycle_wall_color()
-        elif key == 'r':
+        elif key == '3':
             grid = create_grid(width, height)
             if height >= 5 and width >= 7:
                 add_pattern_42(grid, width, height)
@@ -112,9 +116,12 @@ def main():
             raw_path = find_path(grid, entry, exit)
             directions = path_to_directions(raw_path)
             maze = grid_to_maze(grid)
+            pattern_cells = get_pattern_cells(grid)
             display.maze = maze
+            display.pattern_cells = pattern_cells
             display.set_path(directions)
-            save_maze(grid, entry, exit, raw_path, filename)
+        else:
+            print("Invalid choice! Enter 1, 2, 3 or 4")
 
 
 main()

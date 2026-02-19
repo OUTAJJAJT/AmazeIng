@@ -8,7 +8,7 @@ class TerminalDisplay:
     CYAN = '\033[36m'
     WHITE = '\033[37m'
 
-    def __init__(self, maze, entry, exit):
+    def __init__(self, maze, entry, exit, pattern_cells=None):
         self.maze = maze
         self.entry = entry
         self.exit = exit
@@ -17,6 +17,7 @@ class TerminalDisplay:
         self.show_path = False
         self.path_cells = set()
         self.wall_color = self.CYAN
+        self.pattern_cells = pattern_cells or set()
 
     def render(self):
         output = []
@@ -26,7 +27,9 @@ class TerminalDisplay:
             top = ''
             for x in range(self.width):
                 cell = self.maze[y][x]
-                if cell & 1:
+                if (x, y) in self.pattern_cells:
+                    top += self.YELLOW + '█████' + self.RESET
+                elif cell & 1:
                     top += self.wall_color + '█████' + self.RESET
                 else:
                     top += self.wall_color + '█' + self.RESET + '    '
@@ -36,18 +39,21 @@ class TerminalDisplay:
             middle = ''
             for x in range(self.width):
                 cell = self.maze[y][x]
-                if cell & 8:
-                    middle += self.wall_color + '█' + self.RESET
+                if (x, y) in self.pattern_cells:
+                    middle += self.YELLOW + '█████' + self.RESET
                 else:
-                    middle += ' '
-                if (x, y) == self.entry:
-                    middle += self.GREEN + ' E  ' + self.RESET
-                elif (x, y) == self.exit:
-                    middle += self.RED + ' X  ' + self.RESET
-                elif self.show_path and (x, y) in self.path_cells:
-                    middle += self.YELLOW + ' ●  ' + self.RESET
-                else:
-                    middle += '    '
+                    if cell & 8:
+                        middle += self.wall_color + '█' + self.RESET
+                    else:
+                        middle += ' '
+                    if (x, y) == self.entry:
+                        middle += self.GREEN + ' E  ' + self.RESET
+                    elif (x, y) == self.exit:
+                        middle += self.RED + ' X  ' + self.RESET
+                    elif self.show_path and (x, y) in self.path_cells:
+                        middle += self.YELLOW + ' ●  ' + self.RESET
+                    else:
+                        middle += '    '
             if self.maze[y][self.width - 1] & 2:
                 middle += self.wall_color + '█' + self.RESET
             else:
@@ -57,7 +63,9 @@ class TerminalDisplay:
         bottom = ''
         for x in range(self.width):
             cell = self.maze[self.height - 1][x]
-            if cell & 4:
+            if (x, self.height - 1) in self.pattern_cells:
+                bottom += self.YELLOW + '█████' + self.RESET
+            elif cell & 4:
                 bottom += self.wall_color + '█████' + self.RESET
             else:
                 bottom += self.wall_color + '█' + self.RESET + '    '
@@ -67,14 +75,19 @@ class TerminalDisplay:
         return '\n'.join(output)
 
     def display(self):
-        print('\033[2J\033[H', end='')
-        print(self.render())
+        import os
+        os.system('clear' if os.name == 'posix' else 'cls')
+        print(self.render(), flush=True)
+        print()
+        print(self.YELLOW + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)
         print()
         print(self.wall_color + 'Controls:' + self.RESET)
-        print('  p = show/hide path')
-        print('  c = change wall color')
-        print('  r = new maze')
-        print('  q = quit')
+        print('  1. show/hide path')
+        print('  2. change wall color')
+        print('  3. new maze')
+        print('  4. quit')
+        print()
+        print('Enter your choice (1-4): ', end='', flush=True)
 
     def toggle_path(self):
         self.show_path = not self.show_path

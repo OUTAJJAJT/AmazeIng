@@ -53,6 +53,8 @@ def path_to_directions(path):
             directions.append('E')
         elif c2 < c1:
             directions.append('W')
+    
+    print(f"DEBUG: path has {len(path)} cells, directions has {len(directions)} steps")
     return directions
 
 

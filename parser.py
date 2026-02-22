@@ -72,6 +72,7 @@ class ConfigParsing:
         algorithm: str = "recursive_backtracking"
         perfect: bool = True
         seed: int | None = None
+        # imperfect_percentage: float = 0.30
 
         try:
             with open(filename, "r") as file:
@@ -132,11 +133,12 @@ class ConfigParsing:
 
                     elif key == "seed":
                         try:
-                            seed = (value)
-                        except ValueError as e:
-                            raise InvalidDimensionsError(
-                                "seed must be an integer"
-                            ) from e
+                            seed = int(value)
+                        except ValueError:
+                            if value == "none" or value == "None":
+                                seed = None
+                            else:
+                                seed = value
 
         except FileNotFoundError as e:
             raise ConfigError(f"Config file '{filename}' not found") from e
@@ -152,9 +154,8 @@ class ConfigParsing:
         if output_file is None:
             raise InvalidDimensionsError("Output file not found in config file"
                                          )
-        if seed is None:
-            raise InvalidDimensionsError("seed not found in config file"
-                                         )
+        # if seed is None:
+        #     raise InvalidDimensionsError("seed not found in config file")
         if width <= 0:
             raise InvalidDimensionsError(f"Width must be positive, got {width}"
                                          )

@@ -1,6 +1,5 @@
 import sys
 import random
-# from config_parser import ConfigParser
 from parser import ConfigParsing
 from terminal_display import TerminalDisplay
 from generator_maze import create_grid, generate_maze, add_pattern_42
@@ -57,12 +56,15 @@ def path_to_directions(path):
             directions.append('E')
         elif c2 < c1:
             directions.append('W')
+
+    print(f"DEBUG: path has {len(path)} cells, directions has \
+{len(directions)} steps")
     return directions
 
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: python3 a_maze_ing.py config.txt")
+        print("Usage: python3 a_maze_ing.py config.txt or make run")
         sys.exit(1)
 
     parser = ConfigParsing()
@@ -73,20 +75,34 @@ def main():
     entry = config["entry"]
     exit = config["exit"]
     perfect = config["perfect"]
-    seed = config["seed"]
+    seed = config.get("seed", None)
     filename = config["output_file"]
 
-    print(seed)
+    entry = (entry[1], entry[0])
+    exit = (exit[1], exit[0])
+
     if seed is not None:
         random.seed(seed)
+
     grid = create_grid(width, height)
     if height >= 5 and width >= 7:
         add_pattern_42(grid, width, height)
+    pattern_cells = get_pattern_cells(grid)
+    print("Pattern 42 cells:", sorted(pattern_cells))
+    if entry in pattern_cells or exit in pattern_cells:
+        print("Error: Entry or exit is on a pattern 42 cell. Please choose \
+different coordinates.")
+        sys.exit(1)
+
     generate_maze(grid, width, height, entry)
 
     if not perfect:
         make_imperfect(grid, width, height, 0.2)
     raw_path = find_path(grid, entry, exit)
+    if not raw_path:
+        print("Error: No path exists between entry and exit. Try different \
+coordinates or regenerate the maze.")
+        sys.exit(1)
     directions = path_to_directions(raw_path)
 
     maze = grid_to_maze(grid)
@@ -114,6 +130,10 @@ def main():
                 add_pattern_42(grid, width, height)
             generate_maze(grid, width, height, entry)
             raw_path = find_path(grid, entry, exit)
+            if not raw_path:
+                print("Error: No path exists between entry and exit. Try \
+different coordinates or regenerate the maze.")
+                sys.exit(1)
             directions = path_to_directions(raw_path)
             maze = grid_to_maze(grid)
             pattern_cells = get_pattern_cells(grid)

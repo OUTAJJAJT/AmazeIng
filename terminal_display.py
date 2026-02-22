@@ -1,12 +1,18 @@
+from parser import ConfigParsing
+import os
+import time
+import shutil
+
+
 class TerminalDisplay:
 
-    RESET  = '\033[0m'
-    RED    = '\033[31m'
-    GREEN  = '\033[32m'
+    RESET = '\033[0m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
     YELLOW = '\033[33m'
-    BLUE   = '\033[34m'
-    CYAN   = '\033[36m'
-    WHITE  = '\033[37m'
+    BLUE = '\033[34m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
 
     def __init__(self, maze, entry, exit, pattern_cells=None):
         self.maze = maze
@@ -75,9 +81,58 @@ class TerminalDisplay:
         return '\n'.join(output)
 
     def display(self):
-        import os
-        os.system('clear' if os.name == 'posix' else 'cls')
+        parser = ConfigParsing()
+        config = parser.parse("config.txt")
+
+        width = config["width"]
+        height = config["height"]
+
+        # Required terminal size
+        required_width = self.width * 5 + 1
+        required_height = self.height * 2 + 1 + 8
+
+        def clear():
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+        def get_term_size():
+            try:
+                size = shutil.get_terminal_size()
+                return size.columns, size.lines
+            except OSError:
+                return None, None
+
+        # 🔥 Try auto-resize (best effort)
+        print(f"\033[8;{required_height};{required_width}t", end="")
+
+        # 🔒 Wait until terminal is big enough (LIVE, no Enter)
+        while True:
+            cols, lines = get_term_size()
+
+            if cols is None:
+                break  # can't detect → continue anyway
+
+            if cols >= required_width and lines >= required_height:
+                break
+
+            clear()
+
+            # ✨ nicer warning box
+            print(self.RED + "╔" + "═" * 40 + "╗" + self.RESET)
+            print(self.RED + "║        TERMINAL TOO SMALL              ║" +
+                  self.RESET)
+            print(self.RED + "╠" + "═" * 40 + "╣" + self.RESET)
+            print(f" Required : {required_width} x {required_height}")
+            print(f" Current  : {cols} x {lines}")
+            print()
+            print(" ➜ Please enlarge your terminal window...")
+            print(self.RED + "╚" + "═" * 40 + "╝" + self.RESET)
+
+            time.sleep(0.25)  # smooth refresh
+
+        # ✅ Final render
+        clear()
         print(self.render(), flush=True)
+
         print()
         print(self.YELLOW + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)
         print()
@@ -86,7 +141,10 @@ class TerminalDisplay:
         print('  2. change wall color')
         print('  3. new maze')
         print('  4. quit')
-        print()
+
+        if height < 5 or width < 7:
+            print("\nyour maze is small to show pattern 42\n")
+
         print('Enter your choice (1-4): ', end='', flush=True)
 
     def toggle_path(self):

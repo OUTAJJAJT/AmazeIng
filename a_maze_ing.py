@@ -1,5 +1,5 @@
 import sys
-from config_parser import ConfigParser
+from parser import ConfigParsing
 from terminal_display import TerminalDisplay
 from generator_maze import create_grid, generate_maze, add_pattern_42
 from pathfinding import find_path

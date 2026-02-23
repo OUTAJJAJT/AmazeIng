@@ -71,7 +71,8 @@ class ConfigParsing:
         output_file: str | None = None
         algorithm: str = "recursive_backtracking"
         perfect: bool = True
-        imperfect_percentage: float = 0.30
+        seed: int | None = None
+        # imperfect_percentage: float = 0.30
 
         try:
             with open(filename, "r") as file:
@@ -130,11 +131,14 @@ class ConfigParsing:
                     elif key == "perfect":
                         perfect = value.lower() in ("true", "1", "yes")
 
-                    elif key == "imperfect_percentage":
+                    elif key == "seed":
                         try:
-                            imperfect_percentage = float(value)
+                            seed = int(value)
                         except ValueError:
-                            imperfect_percentage = 0.30
+                            if value == "none" or value == "None":
+                                seed = None
+                            else:
+                                seed = value
 
         except FileNotFoundError as e:
             raise ConfigError(f"Config file '{filename}' not found") from e
@@ -150,6 +154,8 @@ class ConfigParsing:
         if output_file is None:
             raise InvalidDimensionsError("Output file not found in config file"
                                          )
+        # if seed is None:
+        #     raise InvalidDimensionsError("seed not found in config file")
         if width <= 0:
             raise InvalidDimensionsError(f"Width must be positive, got {width}"
                                          )
@@ -187,7 +193,7 @@ class ConfigParsing:
             "output_file": output_file,
             "algorithm": algorithm,
             "perfect": perfect,
-            "imperfect_percentage": imperfect_percentage,
+            "seed": seed
         }
 
 

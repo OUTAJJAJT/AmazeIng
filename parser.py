@@ -191,16 +191,5 @@ class ConfigParsing:
         }
 
 
-parser: ConfigParsing = ConfigParsing()
 
-try:
-    config: Dict[str, Any] = parser.parse("config.txt")
-    print("Configuration loaded successfully!")
-    print(f"Width: {config['width']}")
-    print(f"Height: {config['height']}")
-    print(f"Entry: {config['entry']}")
-    print(f"Exit: {config['exit']}")
-    print(f"Output file: {config['output_file']}")
-    print(f"Algorithm: {config['algorithm']}")
-except MazeError as e:
-    print(f"Error: {e}")
+

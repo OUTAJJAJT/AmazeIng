@@ -63,13 +63,13 @@ def main():
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)
 
-    parser = ConfigParser(sys.argv[1])
-    config = parser.parse()
+    parser = ConfigParsing()
+    config = parser.parse(sys.argv[1])
 
-    width  = parser.get_int('WIDTH')
-    height = parser.get_int('HEIGHT')
-    entry  = parser.get_coords('ENTRY')
-    exit   = parser.get_coords('EXIT')
+    width  = config["width"]
+    height = config["height"]
+    entry  = config["entry"]
+    exit   = config["exit"]
 
     entry_rc = (entry[1], entry[0])
     exit_rc  = (exit[1],  exit[0])

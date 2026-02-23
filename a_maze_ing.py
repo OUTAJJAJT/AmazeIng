@@ -67,15 +67,6 @@ def main():
         print("Usage: python3 a_maze_ing.py config.txt or make run")
         sys.exit(1)
 
-    parser = ConfigParsing()
-<<<<<<< HEAD
-    config = parser.parse(sys.argv[1])
-
-    width  = config["width"]
-    height = config["height"]
-    entry  = config["entry"]
-    exit   = config["exit"]
-=======
     config = parser.parse("config.txt")
 
     width = config["width"]
@@ -85,7 +76,6 @@ def main():
     perfect = config["perfect"]
     seed = config.get("seed", None)
     filename = config["output_file"]
->>>>>>> b77b5d35656316c5ee806603502c1bbcd6df22e4
 
     entry = (entry[1], entry[0])
     exit = (exit[1], exit[0])

@@ -87,7 +87,6 @@ class TerminalDisplay:
         width = config["width"]
         height = config["height"]
 
-        # Required terminal size
         required_width = self.width * 5 + 1
         required_height = self.height * 2 + 1 + 8
 
@@ -101,22 +100,20 @@ class TerminalDisplay:
             except OSError:
                 return None, None
 
-        # 🔥 Try auto-resize (best effort)
         print(f"\033[8;{required_height};{required_width}t", end="")
 
-        # 🔒 Wait until terminal is big enough (LIVE, no Enter)
         while True:
             cols, lines = get_term_size()
 
             if cols is None:
-                break  # can't detect → continue anyway
+                break
 
             if cols >= required_width and lines >= required_height:
                 break
 
             clear()
 
-            # ✨ nicer warning box
+
             print(self.RED + "╔" + "═" * 40 + "╗" + self.RESET)
             print(self.RED + "║        TERMINAL TOO SMALL              ║" +
                   self.RESET)
@@ -127,9 +124,9 @@ class TerminalDisplay:
             print(" ➜ Please enlarge your terminal window...")
             print(self.RED + "╚" + "═" * 40 + "╝" + self.RESET)
 
-            time.sleep(0.25)  # smooth refresh
+            time.sleep(0.25)
 
-        # ✅ Final render
+
         clear()
         print(self.render(), flush=True)
 

@@ -67,6 +67,7 @@ def main():
         print("Usage: python3 a_maze_ing.py config.txt or make run")
         sys.exit(1)
 
+    parser = ConfigParsing()
     config = parser.parse("config.txt")
 
     width = config["width"]

@@ -10,6 +10,7 @@ def reconstruct_path(parent, start, goal):
         current = parent[current]
 
     path.reverse()
+    print(path)
     return path
 
 

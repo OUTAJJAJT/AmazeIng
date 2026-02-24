@@ -6,6 +6,20 @@ import shutil
 
 class TerminalDisplay:
 
+    def show_error(self, message):
+        box_width = 60
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(self.RED + "╔" + "═" * box_width + "╗" + self.RESET)
+        print(self.RED + f"║{'ERROR':^{box_width}}║" + self.RESET)
+        print(self.RED + "╠" + "═" * box_width + "╣" + self.RESET)
+        for line in message.splitlines():
+            # Print the message in chunks if it's longer than box_width
+            for i in range(0, len(line), box_width):
+                print(self.RED + f"║{line[i:i+box_width]:^{box_width}}║" +
+                      self.RESET)
+        print(self.RED + "╚" + "═" * box_width + "╝" + self.RESET)
+        print()
+
     RESET = '\033[0m'
     RED = '\033[31m'
     GREEN = '\033[32m'
@@ -16,8 +30,8 @@ class TerminalDisplay:
 
     def __init__(self, maze, entry, exit, pattern_cells=None):
         self.maze = maze
-        self.entry = entry
-        self.exit = exit
+        self.entry = (entry[1], entry[0])
+        self.exit = (exit[1], exit[0])
         self.height = len(maze)
         self.width = len(maze[0])
         self.show_path = False
@@ -163,10 +177,10 @@ class TerminalDisplay:
         x, y = self.entry
         self.path_cells.add((x, y))
         moves = {
-            'N': (0, -1),
-            'E': (1,  0),
-            'S': (0,  1),
-            'W': (-1, 0)
+            'N': (0, -1),   # North: y decreases
+            'E': (1,  0),   # East: x increases
+            'S': (0,  1),   # South: y increases
+            'W': (-1, 0)    # West: x decreases
         }
         for step in path:
             dx, dy = moves[step]

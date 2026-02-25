@@ -148,7 +148,7 @@ class TerminalDisplay:
         print(self.render(), flush=True)
 
         print()
-        print(self.YELLOW + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)
+        print('\033[25;36;5m' + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)
         print()
         print(self.wall_color + 'Controls:' + self.RESET)
         print('  1. show/hide path')

@@ -163,6 +163,7 @@ class TerminalDisplay:
 
     def toggle_path(self):
         self.show_path = not self.show_path
+        return self.show_path
 
     def cycle_wall_color(self):
         colors = [self.CYAN, self.GREEN, self.YELLOW, self.RED, self.WHITE]

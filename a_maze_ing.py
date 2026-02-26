@@ -77,7 +77,10 @@ def main():
     perfect = config["perfect"]
     seed = config.get("seed", None)
     filename = config["output_file"]
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5f8426a87478671013e62939cb49cb7a63a57679
 
     entry = (entry[1], entry[0])
     exit = (exit[1], exit[0])

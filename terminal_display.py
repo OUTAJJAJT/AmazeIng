@@ -57,7 +57,7 @@ class TerminalDisplay:
                     elif (x, y) == self.exit:
                         middle += self.RED + ' X  ' + self.RESET
                     elif self.show_path and (x, y) in self.path_cells:
-                        middle += self.YELLOW + ' ●  ' + self.RESET
+                         middle += self.YELLOW + ' ●  ' + self.RESET
                     else:
                         middle += '    '
             if self.maze[y][self.width - 1] & 2:
@@ -77,7 +77,6 @@ class TerminalDisplay:
                 bottom += self.wall_color + '█' + self.RESET + '    '
         bottom += self.wall_color + '█' + self.RESET
         output.append(bottom)
-
         return '\n'.join(output)
 
     def display(self):
@@ -87,7 +86,6 @@ class TerminalDisplay:
         width = config["width"]
         height = config["height"]
 
-        # Required terminal size
         required_width = self.width * 5 + 1
         required_height = self.height * 2 + 1 + 8
 
@@ -101,22 +99,20 @@ class TerminalDisplay:
             except OSError:
                 return None, None
 
-        # 🔥 Try auto-resize (best effort)
         print(f"\033[8;{required_height};{required_width}t", end="")
 
-        # 🔒 Wait until terminal is big enough (LIVE, no Enter)
         while True:
             cols, lines = get_term_size()
 
             if cols is None:
-                break  # can't detect → continue anyway
+                break
 
             if cols >= required_width and lines >= required_height:
                 break
 
             clear()
 
-            # ✨ nicer warning box
+
             print(self.RED + "╔" + "═" * 40 + "╗" + self.RESET)
             print(self.RED + "║        TERMINAL TOO SMALL              ║" +
                   self.RESET)
@@ -127,14 +123,18 @@ class TerminalDisplay:
             print(" ➜ Please enlarge your terminal window...")
             print(self.RED + "╚" + "═" * 40 + "╝" + self.RESET)
 
-            time.sleep(0.25)  # smooth refresh
+            time.sleep(0.25)
 
-        # ✅ Final render
+
         clear()
+        # tmp = self.render()
+        # for color in tmp:
+        #     print(color, end="", flush=True)
+        #     time.sleep(0.0001)
         print(self.render(), flush=True)
 
         print()
-        print(self.YELLOW + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)
+        print('\033[45;36;5m' + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴' + self.RESET)
         print()
         print(self.wall_color + 'Controls:' + self.RESET)
         print('  1. show/hide path')
@@ -149,6 +149,17 @@ class TerminalDisplay:
 
     def toggle_path(self):
         self.show_path = not self.show_path
+        # tmp = self.path_cells
+        # for i in range(len(tmp) - 1):
+        #     x1, y1 = tmp[i]
+        #     x2, y2 = tmp[i + 1]
+        #     gx = (x1 + x2) // 2
+        #     gy = (y1 + y2) // 2
+            
+        # canvas = self.render()
+        # print(canvas)
+
+
 
     def cycle_wall_color(self):
         colors = [self.CYAN, self.GREEN, self.YELLOW, self.RED, self.WHITE]

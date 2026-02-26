@@ -68,7 +68,11 @@ def main():
         sys.exit(1)
 
     parser = ConfigParsing()
+<<<<<<< HEAD
     config = parser.parse(sys.argv[1])
+=======
+    config = parser.parse("config.txt")
+>>>>>>> 5f8426a87478671013e62939cb49cb7a63a57679
 
     width = config["width"]
     height = config["height"]

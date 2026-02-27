@@ -44,7 +44,6 @@ def save_maze(grid, entry, exit_pos, path, filename) -> None:
 
     height = len(grid)
     width = len(grid[0])
-
     try:
         with open(filename, "w") as file:
             for row in range(height):
@@ -54,8 +53,9 @@ def save_maze(grid, entry, exit_pos, path, filename) -> None:
                     line += format(value, "X")
                 file.write(line + "\n")
 
-            file.write(f"\n{entry[0]},{entry[1]}\n")
-            file.write(f"{exit_pos[0]},{exit_pos[1]}\n")
+            # Convert from (row, col) to (x, y) format for output
+            file.write(f"\n{entry[1]},{entry[0]}\n")
+            file.write(f"{exit_pos[1]},{exit_pos[0]}\n")
 
             if path:
                 directions = path_to_directions(path)

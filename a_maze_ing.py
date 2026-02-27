@@ -1,12 +1,18 @@
 import sys
 import random
-# from config_parser import ConfigParser
 from parser import ConfigParsing
 from terminal_display import TerminalDisplay
 from generator_maze import create_grid, generate_maze, add_pattern_42
 from pathfinding import find_path
 from generator_maze import make_imperfect
 from output_hex import save_maze
+
+# Animation speeds (seconds per step)
+SPEEDS = {
+    'slow': 0.1,
+    'medium': 0.05,
+    'fast': 0.01
+}
 
 
 def get_key():
@@ -57,71 +63,132 @@ def path_to_directions(path):
             directions.append('E')
         elif c2 < c1:
             directions.append('W')
+
+    print(f"DEBUG: path has {len(path)} cells, directions has \
+{len(directions)} steps")
     return directions
 
 
 def main():
+    # Early error handling: use temp display for errors before main display
+    # exists
     if len(sys.argv) != 2:
-        print("Usage: python3 a_maze_ing.py config.txt")
+        temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+        temp_display.show_error("Usage: python3 a_maze_ing.py config.txt or\
+make run")
         sys.exit(1)
 
-    parser = ConfigParsing()
-    config = parser.parse("config.txt")
+    try:
+        parser = ConfigParsing()
+        config = parser.parse("config.txt")
+    except Exception as e:
+        temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+        temp_display.show_error(f"Config error: {e}")
+        sys.exit(1)
 
     width = config["width"]
     height = config["height"]
     entry = config["entry"]
     exit = config["exit"]
     perfect = config["perfect"]
-    seed = config["seed"]
+    seed = config.get("seed", None)
     filename = config["output_file"]
+    entry = (entry[0], entry[1])
+    exit = (exit[0], exit[1])
 
-    print(seed)
     if seed is not None:
         random.seed(seed)
+
     grid = create_grid(width, height)
     if height >= 5 and width >= 7:
         add_pattern_42(grid, width, height)
+    pattern_cells = get_pattern_cells(grid)
+    if entry in pattern_cells or exit in pattern_cells:
+        temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+        temp_display.show_error("Entry or exit is on a pattern 42 cell.\n\
+            Please choose different coordinates.")
+        sys.exit(1)
+
     generate_maze(grid, width, height, entry)
 
     if not perfect:
         make_imperfect(grid, width, height, 0.2)
     raw_path = find_path(grid, entry, exit)
+    if not raw_path:
+        temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+        temp_display.show_error("No path exists between entry and exit.\n\
+            Try different coordinates or regenerate the maze.")
+        sys.exit(1)
     directions = path_to_directions(raw_path)
 
     maze = grid_to_maze(grid)
 
-    pattern_cells = get_pattern_cells(grid)
     display = TerminalDisplay(maze, entry, exit, pattern_cells)
     display.set_path(directions)
+
+    # Animation speed
+    animation_speed = 'medium'
     save_maze(grid, entry, exit, raw_path, filename)
 
-    while True:
-        display.display()
-        key = get_key()
+    try:
+        while True:
+            display.display()
+            key = get_key()
 
-        if key == '4':
-            print('\033[2J\033[H', end='')
-            print("Bye!")
-            break
-        elif key == '1':
-            display.toggle_path()
-        elif key == '2':
-            display.cycle_wall_color()
-        elif key == '3':
-            grid = create_grid(width, height)
-            if height >= 5 and width >= 7:
-                add_pattern_42(grid, width, height)
-            generate_maze(grid, width, height, entry)
-            raw_path = find_path(grid, entry, exit)
-            directions = path_to_directions(raw_path)
-            maze = grid_to_maze(grid)
-            pattern_cells = get_pattern_cells(grid)
-            display.maze = maze
-            display.pattern_cells = pattern_cells
-            display.set_path(directions)
-        else:
-            print("Invalid choice! Enter 1, 2, 3 or 4")
+            if key == '1':
+                if not display.show_path:
+                    display.animate_path(animation_speed)
+                else:
+                    display.show_path = False
+            elif key == '2':
+                display.cycle_wall_color()
+            elif key == '3':
+                grid = create_grid(width, height)
+                if height >= 5 and width >= 7:
+                    add_pattern_42(grid, width, height)
+                pattern_cells = get_pattern_cells(grid)
+                if entry in pattern_cells or exit in pattern_cells:
+                    temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+                    temp_display.show_error("Entry or exit is on a pattern\
+                        42 cell.\nPlease choose different coordinates.")
+                    continue
+                generate_maze(grid, width, height, entry)
+                if not perfect:
+                    make_imperfect(grid, width, height, 0.2)
+                raw_path = find_path(grid, entry, exit)
+                if not raw_path:
+                    temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+                    temp_display.show_error("No path exists between entry \
+                        and exit.\nTry different coordinates or regenerate\
+                            the maze.")
+                    continue
+                directions = path_to_directions(raw_path)
+                maze = grid_to_maze(grid)
+                pattern_cells = get_pattern_cells(grid)
+                display.maze = maze
+                display.pattern_cells = pattern_cells
+                display.set_path(directions)
+            elif key == '4':
+                print('\033[2J\033[H', end='')
+                print("Bye!")
+                break
+            else:
+                temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+                temp_display.show_error("Invalid choice! Enter 1, 2, 3 or \
+                    4")
+                continue
+    except KeyboardInterrupt:
+        temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+        temp_display.show_error("Program interrupted by user (Ctrl+C). \
+Exiting...")
+        sys.exit(0)
 
 
-main()
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+        temp_display.show_error("Program interrupted by user (Ctrl+C). \
+            Exiting...")
+        sys.exit(0)

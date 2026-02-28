@@ -93,8 +93,8 @@ make run")
     perfect = config["perfect"]
     seed = config.get("seed", None)
     filename = config["output_file"]
-    entry = (entry[0], entry[1])
-    exit = (exit[0], exit[1])
+    entry = (entry[1], entry[0])
+    exit = (exit[1], exit[0])
 
     if seed is not None:
         random.seed(seed)

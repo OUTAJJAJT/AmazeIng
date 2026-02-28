@@ -25,7 +25,7 @@ def get_opposite(direction: str) -> str:
 
 
 def carve_passages(grid: list[list[dict]], row: int, col: int,
-                   width: int, height: int) -> None:
+                   width: int, height: int, display_callback=None) -> None:
     """Recursively carve passages through the maze (DFS).
 
     Args:
@@ -34,6 +34,7 @@ def carve_passages(grid: list[list[dict]], row: int, col: int,
         col: Current column.
         width: Maze width.
         height: Maze height.
+        display_callback: Optional function to call for animation.
     """
     grid[row][col]["visited"] = True
 
@@ -48,12 +49,15 @@ def carve_passages(grid: list[list[dict]], row: int, col: int,
                 grid[row][col][direction] = False
                 opposite = get_opposite(direction)
                 grid[new_row][new_col][opposite] = False
+                
+                if display_callback:
+                    display_callback(grid)
 
-                carve_passages(grid, new_row, new_col, width, height)
+                carve_passages(grid, new_row, new_col, width, height, display_callback)
 
 
 def generate_maze(grid: list[list[dict]], width: int, height: int,
-                  entry: tuple[int, int]) -> None:
+                  entry: tuple[int, int], display_callback=None) -> None:
     """Generate maze using recursive backtracking.
 
     Args:
@@ -61,9 +65,10 @@ def generate_maze(grid: list[list[dict]], width: int, height: int,
         width: Maze width.
         height: Maze height.
         entry: Starting position (row, col).
+        display_callback: Optional function to call for animation.
     """
     entry_row, entry_col = entry
-    carve_passages(grid, entry_row, entry_col, width, height)
+    carve_passages(grid, entry_row, entry_col, width, height, display_callback)
 
 
 def can_remove_wall(grid, row, col, direction, width, height):
@@ -98,7 +103,6 @@ def make_imperfect(grid, width, height, removal_percentage):
 
     total_cells = width + height
 
-    # Safer wall removal amount
     walls_to_remove = max(1, int((total_cells) * removal_percentage))
 
     removed = 0
@@ -114,7 +118,7 @@ def make_imperfect(grid, width, height, removal_percentage):
         col = random.randint(0, width - 1)
         direction = random.choice(directions)
 
-        if not grid[row][col][direction]:  # skip if already removed
+        if not grid[row][col][direction]:
             continue
 
         if not can_remove_wall(grid, row, col, direction, width, height):

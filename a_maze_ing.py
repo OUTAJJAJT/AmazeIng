@@ -6,9 +6,7 @@ from generator_maze import create_grid, generate_maze, add_pattern_42
 from pathfinding import find_path
 from generator_maze import make_imperfect
 from output_hex import save_maze
-import time
 
-# Animation speeds (seconds per step)
 SPEEDS = {
     'slow': 0.1,
     'medium': 0.05,
@@ -92,8 +90,17 @@ def main():
     grid = create_grid(width, height)
     if height >= 5 and width >= 7:
         add_pattern_42(grid, width, height)
+
+    animation_speed = 'fast'
     
-    generate_maze(grid, width, height, entry_rc)
+    maze = grid_to_maze(grid)
+    pattern_cells = get_pattern_cells(grid)
+    display = TerminalDisplay(maze, entry, exit, pattern_cells)
+    
+    def animation_callback(g):
+        display.animate_generation(g, animation_speed)
+    
+    generate_maze(grid, width, height, entry_rc, animation_callback)
 
     if not perfect:
         make_imperfect(grid, width, height, 0.2)
@@ -107,11 +114,9 @@ def main():
     maze = grid_to_maze(grid)
     pattern_cells = get_pattern_cells(grid)
     
-    display = TerminalDisplay(maze, entry, exit, pattern_cells)
+    display.maze = maze
+    display.pattern_cells = pattern_cells
     display.set_path(directions)
-    
-    # Animation speed
-    animation_speed = 'medium'
     
     save_maze(grid, entry_rc, exit_rc, raw_path, filename)
 
@@ -134,13 +139,25 @@ def main():
             grid = create_grid(width, height)
             if height >= 5 and width >= 7:
                 add_pattern_42(grid, width, height)
-            generate_maze(grid, width, height, entry_rc)
+            
+            maze = grid_to_maze(grid)
+            pattern_cells = get_pattern_cells(grid)
+            display.maze = maze
+            display.pattern_cells = pattern_cells
+            
+            def animation_callback(g):
+                display.animate_generation(g, animation_speed)
+            
+            generate_maze(grid, width, height, entry_rc, animation_callback)
+            
             if not perfect:
                 make_imperfect(grid, width, height, 0.2)
+            
             raw_path = find_path(grid, entry_rc, exit_rc)
             if not raw_path:
                 print("Error: No path found!")
                 continue
+            
             directions = path_to_directions(raw_path)
             maze = grid_to_maze(grid)
             pattern_cells = get_pattern_cells(grid)

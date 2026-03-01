@@ -130,6 +130,8 @@ make run")
             elif key == '2':
                 display.cycle_wall_color()
             elif key == '3':
+                if display.show_path:
+                    display.show_path = False
                 grid = create_grid(width, height)
                 if height >= 5 and width >= 7:
                     add_pattern_42(grid, width, height)

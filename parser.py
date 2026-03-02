@@ -73,7 +73,7 @@ class ConfigParsing:
         perfect: bool = True
         seed: int | None = None
         # imperfect_percentage: float = 0.30
-
+        from terminal_display import TerminalDisplay
         try:
             with open(filename, "r") as file:
                 for line in file:
@@ -139,51 +139,63 @@ class ConfigParsing:
                                 seed = None
                             else:
                                 seed = value
-
-        except FileNotFoundError as e:
-            raise ConfigError(f"Config file '{filename}' not found") from e
+        except FileNotFoundError:
+            # raise ConfigError(f"Config file '{filename}' not found") from e
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error(f"Config file '{filename}' not found")
+        from terminal_display import TerminalDisplay
 
         if width is None:
-            raise InvalidDimensionsError("Width not found in config file")
+            # raise InvalidDimensionsError("Width not found in config file")
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error("Width not found in config file")
         if height is None:
-            raise InvalidDimensionsError("Height not found in config file")
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error("Height not found in config file")
+            # raise InvalidDimensionsError("Height not found in config file")
         if entry is None:
-            raise InvalidCoordinatesError("Entry not found in config file")
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error("Entry not found in config file")
         if exit_coord is None:
-            raise InvalidCoordinatesError("Exit not found in config file")
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error("Exit not found in config file")
         if output_file is None:
-            raise InvalidDimensionsError("Output file not found in config file"
-                                         )
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error("Output file not found in config file")
         # if seed is None:
         #     raise InvalidDimensionsError("seed not found in config file")
         if width <= 0:
-            raise InvalidDimensionsError(f"Width must be positive, got {width}"
-                                         )
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error(f"Width must be positive, got {width}")
         if height <= 0:
-            raise InvalidDimensionsError(f"Height must be positive, got\
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error(f"Height must be positive, got \
 {height}")
 
         max_dimension: int = 1000
         if width > max_dimension:
-            raise InvalidDimensionsError(
-                f"Width too large (max {max_dimension}), got {width}"
-            )
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error(f"Width too large (max {max_dimension}), \
+got {width}")
         if height > max_dimension:
-            raise InvalidDimensionsError(
-                f"Height too large (max {max_dimension}), got {height}"
-            )
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error(f"Height too large (max {max_dimension}), \
+got {height}")
         entry_x, entry_y = entry
         exit_x, exit_y = exit_coord
 
         if entry_x < 0 or entry_x >= width or entry_y < 0 or entry_y >= height:
-            raise InvalidCoordinatesError(f"Entry {entry} is out of bounds (0-\
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error(f"Entry {entry} is out of bounds (0-\
 {width - 1}, 0-{height - 1})")
         if exit_x < 0 or exit_x >= width or exit_y < 0 or exit_y >= height:
-            raise InvalidCoordinatesError(f"Exit {exit_coord} is out of bounds\
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error(f"Exit {exit_coord} is out of bounds\
  (0-{width - 1}, 0-{height - 1})")
 
         if entry == exit_coord:
-            raise InvalidCoordinatesError("Entry and exit cannot be the same")
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error("Entry and exit cannot be the same")
 
         return {
             "width": width,

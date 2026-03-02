@@ -25,7 +25,7 @@ def get_opposite(direction: str) -> str:
 
 
 def carve_passages(grid: list[list[dict]], row: int, col: int,
-                   width: int, height: int) -> None:
+                   width: int, height: int, display_callback=None) -> None:
     """Recursively carve passages through the maze (DFS).
 
     Args:
@@ -49,11 +49,14 @@ def carve_passages(grid: list[list[dict]], row: int, col: int,
                 opposite = get_opposite(direction)
                 grid[new_row][new_col][opposite] = False
 
-                carve_passages(grid, new_row, new_col, width, height)
+                if display_callback is not None:
+                    display_callback(grid)
+
+                carve_passages(grid, new_row, new_col, width, height, display_callback)
 
 
 def generate_maze(grid: list[list[dict]], width: int, height: int,
-                  entry: tuple[int, int]) -> None:
+                  entry: tuple[int, int], display_callback=None) -> None:
     """Generate maze using recursive backtracking.
 
     Args:
@@ -63,7 +66,9 @@ def generate_maze(grid: list[list[dict]], width: int, height: int,
         entry: Starting position (row, col).
     """
     entry_row, entry_col = entry
-    carve_passages(grid, entry_row, entry_col, width, height)
+    if display_callback is not None:
+        display_callback(grid)
+    carve_passages(grid, entry_row, entry_col, width, height, display_callback)
 
 
 def can_remove_wall(grid, row, col, direction, width, height):

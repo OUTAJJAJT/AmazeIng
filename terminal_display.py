@@ -27,6 +27,7 @@ class TerminalDisplay:
     BLUE = '\033[34m'
     CYAN = '\033[36m'
     WHITE = '\033[37m'
+    BLINK = '\033[5m'
 
     def __init__(self, maze, entry, exit, pattern_cells=None):
         self.maze = maze
@@ -36,6 +37,7 @@ class TerminalDisplay:
         self.width = len(maze[0])
         self.show_path = False
         self.path_cells = set()
+        self.path_order = []
         self.wall_color = self.CYAN
         self.pattern_cells = pattern_cells or set()
 
@@ -175,8 +177,10 @@ class TerminalDisplay:
 
     def set_path(self, path):
         self.path_cells = set()
+        self.path_order = []
         x, y = self.entry
         self.path_cells.add((x, y))
+        self.path_order.append((x, y))
         moves = {
             'N': (0, -1),   # North: y decreases
             'E': (1,  0),   # East: x increases
@@ -187,3 +191,58 @@ class TerminalDisplay:
             dx, dy = moves[step]
             x, y = x + dx, y + dy
             self.path_cells.add((x, y))
+            self.path_order.append((x, y))
+
+    # ==========================================================
+    # ANIMATE PATH (SMOOTH + SLOW)
+    # ==========================================================
+    def animate_path(self, speed='slow'):
+        speeds = {
+            'slow': 0.08,
+            'medium': 0.05,
+            'fast': 0.02
+        }
+
+        delay = speeds.get(speed, 0.08)
+
+        if not self.path_order:
+            return
+
+        for i in range(1, len(self.path_order) + 1):
+            self.path_cells = set(self.path_order[:i])
+            self.show_path = True
+
+            os.system('clear' if os.name == 'posix' else 'cls')
+            print(self.render(), flush=True)
+
+            time.sleep(delay)
+
+    def animate_generation(self, grid, speed='medium'):
+        speeds = {'slow': 0.02, 'medium': 0.005, 'fast': 0.001}
+        delay = speeds.get(speed, 0.005)
+
+        maze = []
+        for row in grid:
+            maze_row = []
+            for cell in row:
+                value = 0
+                if cell["top"]:
+                    value += 1
+                if cell["right"]:
+                    value += 2
+                if cell["bottom"]:
+                    value += 4
+                if cell["left"]:
+                    value += 8
+                maze_row.append(value)
+            maze.append(maze_row)
+
+        self.maze = maze
+
+        os.system('clear' if os.name == 'posix' else 'cls')
+        print(self.render(), flush=True)
+        print()
+        print(self.BLINK + self.YELLOW + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)
+        print('\n🎨 Generating maze...', flush=True)
+
+        time.sleep(delay)

@@ -8,6 +8,13 @@ from generator_maze import make_imperfect
 from output_hex import save_maze
 
 
+SPEEDS = {
+    'slow': 0.1,
+    'medium': 0.08,
+    'fast': 0.01
+}
+
+
 def get_key():
     key = input()
     return key.strip()
@@ -57,8 +64,6 @@ def path_to_directions(path):
         elif c2 < c1:
             directions.append('W')
 
-    print(f"DEBUG: path has {len(path)} cells, directions has \
-{len(directions)} steps")
     return directions
 
 
@@ -95,6 +100,11 @@ make run")
     grid = create_grid(width, height)
     if height >= 5 and width >= 7:
         add_pattern_42(grid, width, height)
+
+    if width >= 30 or height >= 30:
+        animation_speed = 'fast'
+    animation_speed = 'medium'
+    maze = grid_to_maze(grid)
     pattern_cells = get_pattern_cells(grid)
     if entry in pattern_cells or exit in pattern_cells:
         temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
@@ -102,10 +112,16 @@ make run")
             Please choose different coordinates.")
         sys.exit(1)
 
-    generate_maze(grid, width, height, entry)
+    display = TerminalDisplay(maze, entry, exit, pattern_cells)
+
+    def animation_callback(g):
+        display.animate_generation(g, animation_speed)
+
+    generate_maze(grid, width, height, entry, animation_callback)
 
     if not perfect:
-        make_imperfect(grid, width, height, 0.2)
+        make_imperfect(grid, width, height, 0.3)
+
     raw_path = find_path(grid, entry, exit)
     if not raw_path:
         temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
@@ -113,10 +129,14 @@ make run")
             Try different coordinates or regenerate the maze.")
         sys.exit(1)
     directions = path_to_directions(raw_path)
-
     maze = grid_to_maze(grid)
 
-    display = TerminalDisplay(maze, entry, exit, pattern_cells)
+    # display = TerminalDisplay(maze, entry, exit, pattern_cells)
+    # display.set_path(directions)
+    pattern_cells = get_pattern_cells(grid)
+
+    display.maze = maze
+    display.pattern_cells = pattern_cells
     display.set_path(directions)
     save_maze(grid, entry, exit, raw_path, filename)
 
@@ -126,22 +146,36 @@ make run")
             key = get_key()
 
             if key == '1':
-                display.toggle_path()
+                if not display.show_path:
+                    display.animate_path(animation_speed)
+                else:
+                    display.show_path = False
             elif key == '2':
                 display.cycle_wall_color()
             elif key == '3':
+                # Check if path is hidden, if not hide it first
                 if display.show_path:
                     display.show_path = False
                 grid = create_grid(width, height)
                 if height >= 5 and width >= 7:
                     add_pattern_42(grid, width, height)
+                maze = grid_to_maze(grid)
+                pattern_cells = get_pattern_cells(grid)
+                display.maze = maze
+                display.pattern_cells = pattern_cells
                 pattern_cells = get_pattern_cells(grid)
                 if entry in pattern_cells or exit in pattern_cells:
                     temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
                     temp_display.show_error("Entry or exit is on a pattern\
                         42 cell.\nPlease choose different coordinates.")
                     continue
-                generate_maze(grid, width, height, entry)
+
+                def animation_callback(g):
+                    display.animate_generation(g, animation_speed)
+
+                generate_maze(grid, width, height, entry, animation_callback)
+                if not perfect:
+                    make_imperfect(grid, width, height, 0.3)
                 raw_path = find_path(grid, entry, exit)
                 if not raw_path:
                     temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
@@ -155,6 +189,7 @@ make run")
                 display.maze = maze
                 display.pattern_cells = pattern_cells
                 display.set_path(directions)
+                save_maze(grid, entry, exit, raw_path, filename)
             elif key == '4':
                 print('\033[2J\033[H', end='')
                 print("Bye!")

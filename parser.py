@@ -146,13 +146,11 @@ class ConfigParsing:
         from terminal_display import TerminalDisplay
 
         if width is None:
-            # raise InvalidDimensionsError("Width not found in config file")
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Width not found in config file")
         if height is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Height not found in config file")
-            # raise InvalidDimensionsError("Height not found in config file")
         if entry is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Entry not found in config file")
@@ -162,8 +160,6 @@ class ConfigParsing:
         if output_file is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Output file not found in config file")
-        # if seed is None:
-        #     raise InvalidDimensionsError("seed not found in config file")
         if width <= 0:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error(f"Width must be positive, got {width}")
@@ -172,7 +168,7 @@ class ConfigParsing:
             temp_display.show_error(f"Height must be positive, got \
 {height}")
 
-        max_dimension: int = 1000
+        max_dimension: int = 23
         if width > max_dimension:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error(f"Width too large (max {max_dimension}), \

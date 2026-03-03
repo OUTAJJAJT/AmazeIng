@@ -52,7 +52,8 @@ def carve_passages(grid: list[list[dict]], row: int, col: int,
                 if display_callback is not None:
                     display_callback(grid)
 
-                carve_passages(grid, new_row, new_col, width, height, display_callback)
+                carve_passages(grid, new_row, new_col, width, height,
+                               display_callback)
 
 
 def generate_maze(grid: list[list[dict]], width: int, height: int,

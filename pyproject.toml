@@ -9,8 +9,8 @@ description = "Maze generation library"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    {name = "Talha Essaadi", email = "talha.weeb@gmail.com"},
-    {name = "Yassine Imgharen", email = "yaimghar@student.1337.ma"},
+    {name = "Hicham Ouzddou", email = "hichamouzddou@gmail.com"},
+    {name = "Souhaib Ait Lahcine", email = "so-ait-l@student.1337.ma"},
 ]
 
 [tool.setuptools.packages.find]

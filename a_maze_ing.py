@@ -91,6 +91,7 @@ make run")
     perfect = config["perfect"]
     seed = config.get("seed", None)
     filename = config["output_file"]
+    imperfect_percentage = config.get("imperfect_percentage", 0.3)
     entry = (entry[0], entry[1])
     exit = (exit[0], exit[1])
 
@@ -120,7 +121,7 @@ make run")
     generate_maze(grid, width, height, entry, animation_callback)
 
     if not perfect:
-        make_imperfect(grid, width, height, 0.3)
+        make_imperfect(grid, width, height, imperfect_percentage)
 
     raw_path = find_path(grid, entry, exit)
     if not raw_path:
@@ -175,7 +176,7 @@ make run")
 
                 generate_maze(grid, width, height, entry, animation_callback)
                 if not perfect:
-                    make_imperfect(grid, width, height, 0.3)
+                    make_imperfect(grid, width, height, imperfect_percentage)
                 raw_path = find_path(grid, entry, exit)
                 if not raw_path:
                     temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))

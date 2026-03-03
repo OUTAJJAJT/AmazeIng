@@ -72,7 +72,7 @@ class ConfigParsing:
         algorithm: str = "recursive_backtracking"
         perfect: bool = True
         seed: int | None = None
-        # imperfect_percentage: float = 0.30
+        imperfect_percentage: float = 0.5
         from terminal_display import TerminalDisplay
         try:
             with open(filename, "r") as file:
@@ -130,6 +130,12 @@ class ConfigParsing:
 
                     elif key == "perfect":
                         perfect = value.lower() in ("true", "1", "yes")
+
+                    elif key == "imperfect_percentage":
+                        try:
+                            imperfect_percentage = float(value)
+                        except ValueError:
+                            imperfect_percentage = 0.3
 
                     elif key == "seed":
                         try:
@@ -201,5 +207,6 @@ got {height}")
             "output_file": output_file,
             "algorithm": algorithm,
             "perfect": perfect,
-            "seed": seed
+            "seed": seed,
+            "imperfect_percentage": imperfect_percentage
         }

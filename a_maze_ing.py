@@ -1,11 +1,11 @@
 import sys
 import random
-from parser import ConfigParsing
+from mazegen.parser import ConfigParsing
 from terminal_display import TerminalDisplay
-from generator_maze import create_grid, generate_maze, add_pattern_42
-from pathfinding import find_path
-from generator_maze import make_imperfect
-from output_hex import save_maze
+from mazegen.generator_maze import create_grid, generate_maze, add_pattern_42
+from mazegen.pathfinding import find_path
+from mazegen.generator_maze import make_imperfect
+from mazegen.output_hex import save_maze
 
 
 SPEEDS = {

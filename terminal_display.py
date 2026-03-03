@@ -1,4 +1,4 @@
-from parser import ConfigParsing
+from mazegen.parser import ConfigParsing
 import os
 import time
 import shutil

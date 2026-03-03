@@ -4,12 +4,12 @@
 width=23   # Maze width (number of cells)
 HEIGHT=23  # Maze height (number of cells)
 
-ENTRY=1,9  # Coordinates of maze entrance (x,y)
-exit=5,7   # Coordinates of maze exit (x,y)
+ENTRY=0,9  # Coordinates of maze entrance (x,y)
+exit=15,19   # Coordinates of maze exit (x,y)
 
 OUTPUT_file=maze.txt   # Output file name
 
-PErFeCT=False       # Whether the maze is perfect (only one path from ENTRY to EXIT)
+PErFeCT=True       # Whether the maze is perfect (only one path from ENTRY to EXIT)
 
 # Optional keys
 SEED=42    # Random seed for reproducibility

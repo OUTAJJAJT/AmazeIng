@@ -19,6 +19,7 @@ class TerminalDisplay:
                       self.RESET)
         print(self.RED + "╚" + "═" * box_width + "╝" + self.RESET)
         print()
+        exit(1)
 
     RESET = '\033[0m'
     RED = '\033[31m'

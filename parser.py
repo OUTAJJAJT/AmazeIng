@@ -67,7 +67,7 @@ class ConfigParsing:
         width: int | None = None
         height: int | None = None
         entry: Tuple[int, int] | None = None
-        exit_coord: Tuple[int, int] | None = None
+        exit: Tuple[int, int] | None = None
         output_file: str | None = None
         algorithm: str = "recursive_backtracking"
         perfect: bool = True
@@ -116,7 +116,7 @@ class ConfigParsing:
                     elif key == "exit":
                         try:
                             x, y = value.split(",")
-                            exit_coord = (int(x.strip()), int(y.strip()))
+                            exit = (int(x.strip()), int(y.strip()))
                         except (ValueError, IndexError) as e:
                             raise InvalidCoordinatesError(
                                 "Exit must be in format: x,y"
@@ -154,7 +154,7 @@ class ConfigParsing:
         if entry is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Entry not found in config file")
-        if exit_coord is None:
+        if exit is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Exit not found in config file")
         if output_file is None:
@@ -178,7 +178,7 @@ got {width}")
             temp_display.show_error(f"Height too large (max {max_dimension}), \
 got {height}")
         entry_x, entry_y = entry
-        exit_x, exit_y = exit_coord
+        exit_x, exit_y = exit
 
         if entry_x < 0 or entry_x >= width or entry_y < 0 or entry_y >= height:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
@@ -186,10 +186,10 @@ got {height}")
 {width - 1}, 0-{height - 1})")
         if exit_x < 0 or exit_x >= width or exit_y < 0 or exit_y >= height:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
-            temp_display.show_error(f"Exit {exit_coord} is out of bounds\
+            temp_display.show_error(f"Exit {exit} is out of bounds\
  (0-{width - 1}, 0-{height - 1})")
 
-        if entry == exit_coord:
+        if entry == exit:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Entry and exit cannot be the same")
 
@@ -197,7 +197,7 @@ got {height}")
             "width": width,
             "height": height,
             "entry": entry,
-            "exit": exit_coord,
+            "exit": exit,
             "output_file": output_file,
             "algorithm": algorithm,
             "perfect": perfect,

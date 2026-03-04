@@ -12,7 +12,7 @@ OUTPUT_file=maze.txt   # Output file name
 PERFECT=False       # Whether the maze is perfect (only one path from ENTRY to EXIT)
 
 # Optional keys
-# SEED=42    # Random seed for reproducibility
+SEED=42    # Random seed for reproducibility
 ALGORITHM=recursive_backtracker         # Generate: Recursive Backtracking (DFS) → Creates the maze
                                         # Solve: Breadth-First Search (BFS) → Finds shortest path through maze
 DISPLAY_MODE=Terminal

@@ -51,7 +51,7 @@ def find_path(grid: list[list[dict]], start: tuple[int, int],
 
     queue = [start]
     visited = {start}
-    parent = {start: None}
+    parent: dict[tuple[int, int], tuple[int, int] | None] = {start: None}
 
     while queue:
         current = queue.pop(0)

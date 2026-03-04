@@ -51,7 +51,7 @@ class TerminalDisplay:
             for x in range(self.width):
                 cell = self.maze[y][x]
                 if (x, y) in self.pattern_cells:
-                    top += self.YELLOW + '█████' + self.RESET
+                    top += self.RED + '█████' + self.RESET
                 elif cell & 1:
                     top += self.wall_color + '█████' + self.RESET
                 else:
@@ -63,7 +63,7 @@ class TerminalDisplay:
             for x in range(self.width):
                 cell = self.maze[y][x]
                 if (x, y) in self.pattern_cells:
-                    middle += self.YELLOW + '█████' + self.RESET
+                    middle += self.RED + '█████' + self.RESET
                 else:
                     if cell & 8:
                         middle += self.wall_color + '█' + self.RESET
@@ -87,7 +87,7 @@ class TerminalDisplay:
         for x in range(self.width):
             cell = self.maze[self.height - 1][x]
             if (x, self.height - 1) in self.pattern_cells:
-                bottom += self.YELLOW + '█████' + self.RESET
+                bottom += self.RED + '█████' + self.RESET
             elif cell & 4:
                 bottom += self.wall_color + '█████' + self.RESET
             else:
@@ -125,7 +125,7 @@ class TerminalDisplay:
         while True:
             cols, lines = get_term_size()
 
-            if cols is None:
+            if cols is None or lines is None:
                 break  # can't detect → continue anyway
 
             if cols >= required_width and lines >= required_height:
@@ -243,7 +243,7 @@ class TerminalDisplay:
         os.system('clear' if os.name == 'posix' else 'cls')
         print(self.render(), flush=True)
         print()
-        print(self.BLINK + self.YELLOW + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!' + self.RESET)
+        print(self.BLINK + self.RED + '𝓡𝓪𝓶𝓪𝓭𝓪𝓷 𝓜𝓾𝓫𝓪𝓻𝓪𝓴!🌙' + self.RESET)
         print('\n🎨 Generating maze...', flush=True)
 
         time.sleep(delay)

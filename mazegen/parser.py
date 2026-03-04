@@ -71,9 +71,11 @@ class ConfigParsing:
         output_file: str | None = None
         algorithm: str = "recursive_backtracking"
         perfect: bool = True
-        seed: int | None = None
+        seed: int | float | str | None = None
         imperfect_percentage: float = 0.5
-        from terminal_display import TerminalDisplay
+        import sys
+        sys.path.insert(0, '..')
+        from terminal_display import TerminalDisplay  # type: ignore
         try:
             with open(filename, "r") as file:
                 for line in file:
@@ -139,33 +141,43 @@ class ConfigParsing:
 
                     elif key == "seed":
                         try:
+                            # Try int first
                             seed = int(value)
                         except ValueError:
-                            if value == "none" or value == "None":
-                                seed = None
-                            else:
-                                seed = value
+                            try:
+                                # Try float
+                                seed = float(value)
+                            except ValueError:
+                                # Keep as string or None
+                                if value.lower() in ("none", ""):
+                                    seed = None
+                                else:
+                                    seed = value
         except FileNotFoundError:
-            # raise ConfigError(f"Config file '{filename}' not found") from e
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error(f"Config file '{filename}' not found")
-        from terminal_display import TerminalDisplay
 
         if width is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Width not found in config file")
+            sys.exit(1)
         if height is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Height not found in config file")
+            sys.exit(1)
         if entry is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Entry not found in config file")
+            sys.exit(1)
         if exit is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Exit not found in config file")
+            sys.exit(1)
         if output_file is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Output file not found in config file")
+            sys.exit(1)
+
         if width <= 0:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error(f"Width must be positive, got {width}")

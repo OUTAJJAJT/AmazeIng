@@ -102,7 +102,7 @@ make run")
     if height >= 5 and width >= 7:
         add_pattern_42(grid, width, height)
 
-    if width >= 30 or height >= 30:
+    if width >= 20 or height >= 20:
         animation_speed = 'fast'
     animation_speed = 'medium'
     maze = grid_to_maze(grid)
@@ -198,7 +198,7 @@ make run")
             else:
                 temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
                 temp_display.show_error("Invalid choice! Enter 1, 2, 3 or \
-                    4")
+4")
                 continue
     except KeyboardInterrupt:
         temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))

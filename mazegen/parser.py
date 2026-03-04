@@ -70,7 +70,7 @@ class ConfigParsing:
         exit: Tuple[int, int] | None = None
         output_file: str | None = None
         algorithm: str = "recursive_backtracking"
-        perfect: bool = True
+        perfect: bool | None = None
         seed: int | float | str | None = None
         imperfect_percentage: float = 0.5
         import sys
@@ -176,6 +176,11 @@ class ConfigParsing:
         if output_file is None:
             temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
             temp_display.show_error("Output file not found in config file")
+            sys.exit(1)
+
+        if perfect is None:
+            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display.show_error("Perfect flag not found in config file")
             sys.exit(1)
 
         if width <= 0:

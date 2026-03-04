@@ -1,11 +1,11 @@
 # Maze configuration file
 # Lines starting with '#' are comments
 
-WIDTH=23   # Maze width (number of cells)
-HEIGHT=23  # Maze height (number of cells)
+WIDTH=15   # Maze width (number of cells)
+HEIGHT=15  # Maze height (number of cells)
 
 ENTRY=0,9  # Coordinates of maze entrance (x,y)
-EXIT=15,19   # Coordinates of maze exit (x,y)
+EXIT=14,14   # Coordinates of maze exit (x,y)
 
 OUTPUT_file=maze.txt   # Output file name
 

@@ -118,10 +118,8 @@ class TerminalDisplay:
             except OSError:
                 return None, None
 
-        # 🔥 Try auto-resize (best effort)
         print(f"\033[8;{required_height};{required_width}t", end="")
 
-        # 🔒 Wait until terminal is big enough (LIVE, no Enter)
         while True:
             cols, lines = get_term_size()
 
@@ -133,7 +131,6 @@ class TerminalDisplay:
 
             clear()
 
-            # ✨ nicer warning box
             print(self.RED + "╔" + "═" * 40 + "╗" + self.RESET)
             print(self.RED + "║        TERMINAL TOO SMALL              ║" +
                   self.RESET)
@@ -146,7 +143,6 @@ class TerminalDisplay:
 
             time.sleep(0.25)  # smooth refresh
 
-        # ✅ Final render
         clear()
         print(self.render(), flush=True)
 
@@ -194,9 +190,6 @@ class TerminalDisplay:
             self.path_cells.add((x, y))
             self.path_order.append((x, y))
 
-    # ==========================================================
-    # ANIMATE PATH (SMOOTH + SLOW)
-    # ==========================================================
     def animate_path(self, speed='slow'):
         speeds = {
             'slow': 0.08,

@@ -10,6 +10,7 @@ debug:
 
 clean:
 	rm -rf __pycache__ .mypy_cache
+	rm -rf mazegen/__pycache__ mazegen/.mypy_cache
 
 lint:
 	flake8 .

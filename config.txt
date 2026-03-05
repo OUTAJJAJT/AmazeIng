@@ -1,15 +1,15 @@
 # Maze configuration file
 # Lines starting with '#' are comments
 
-WIDTH=15   # Maze width (number of cells)
-HEIGHT=15  # Maze height (number of cells)
+WIDTH=4   # Maze width (number of cells)
+HEIGHT=4  # Maze height (number of cells)
 
-ENTRY=0,9  # Coordinates of maze entrance (x,y)
-EXIT=14,14   # Coordinates of maze exit (x,y)
+ENTRY=0,2  # Coordinates of maze entrance (x,y)
+EXIT=2,3   # Coordinates of maze exit (x,y)
 
 OUTPUT_file=maze.txt   # Output file name
 
-PERFECT=False       # Whether the maze is perfect (only one path from ENTRY to EXIT)
+PERFECT=True       # Whether the maze is perfect (only one path from ENTRY to EXIT)
 
 # Optional keys
 SEED=42    # Random seed for reproducibility

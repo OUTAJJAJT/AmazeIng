@@ -2,11 +2,18 @@ from mazegen.parser import ConfigParsing
 import os
 import time
 import shutil
+from typing import Any
+
+
+Position = tuple[int, int]
+MazeGrid = list[list[int]]
+Cell = dict[str, Any]
+GenerationGrid = list[list[Cell]]
 
 
 class TerminalDisplay:
 
-    def show_error(self, message):
+    def show_error(self, message: str) -> None:
         box_width = 60
         os.system('cls' if os.name == 'nt' else 'clear')
         print(self.RED + "╔" + "═" * box_width + "╗" + self.RESET)
@@ -30,19 +37,25 @@ class TerminalDisplay:
     WHITE = '\033[37m'
     BLINK = '\033[5m'
 
-    def __init__(self, maze, entry, exit, pattern_cells=None):
+    def __init__(
+        self,
+        maze: MazeGrid,
+        entry: Position,
+        exit: Position,
+        pattern_cells: set[Position] | None = None
+    ) -> None:
         self.maze = maze
         self.entry = (entry[1], entry[0])
         self.exit = (exit[1], exit[0])
         self.height = len(maze)
         self.width = len(maze[0])
         self.show_path = False
-        self.path_cells = set()
-        self.path_order = []
+        self.path_cells: set[Position] = set()
+        self.path_order: list[Position] = []
         self.wall_color = self.CYAN
         self.pattern_cells = pattern_cells or set()
 
-    def render(self):
+    def render(self) -> str:
         output = []
 
         for y in range(self.height):
@@ -97,7 +110,7 @@ class TerminalDisplay:
 
         return '\n'.join(output)
 
-    def display(self):
+    def display(self) -> None:
         parser = ConfigParsing()
         config = parser.parse("config.txt")
 
@@ -108,10 +121,10 @@ class TerminalDisplay:
         required_width = self.width * 5 + 1
         required_height = self.height * 2 + 1 + 8
 
-        def clear():
+        def clear() -> None:
             os.system('cls' if os.name == 'nt' else 'clear')
 
-        def get_term_size():
+        def get_term_size() -> tuple[int | None, int | None]:
             try:
                 size = shutil.get_terminal_size()
                 return size.columns, size.lines
@@ -160,11 +173,11 @@ class TerminalDisplay:
 
         print('Enter your choice (1-4): ', end='', flush=True)
 
-    def toggle_path(self):
+    def toggle_path(self) -> bool:
         self.show_path = not self.show_path
         return self.show_path
 
-    def cycle_wall_color(self):
+    def cycle_wall_color(self) -> None:
         colors = [self.CYAN, self.GREEN, self.YELLOW, self.RED, self.WHITE]
         try:
             idx = colors.index(self.wall_color)
@@ -172,7 +185,7 @@ class TerminalDisplay:
         except ValueError:
             self.wall_color = self.CYAN
 
-    def set_path(self, path):
+    def set_path(self, path: list[str]) -> None:
         self.path_cells = set()
         self.path_order = []
         x, y = self.entry
@@ -190,7 +203,7 @@ class TerminalDisplay:
             self.path_cells.add((x, y))
             self.path_order.append((x, y))
 
-    def animate_path(self, speed='slow'):
+    def animate_path(self, speed: str = 'slow') -> None:
         speeds = {
             'slow': 0.08,
             'medium': 0.05,
@@ -211,7 +224,11 @@ class TerminalDisplay:
 
             time.sleep(delay)
 
-    def animate_generation(self, grid, speed='medium'):
+    def animate_generation(
+        self,
+        grid: GenerationGrid,
+        speed: str = 'medium'
+    ) -> None:
         speeds = {'slow': 0.02, 'medium': 0.005, 'fast': 0.001}
         delay = speeds.get(speed, 0.005)
 

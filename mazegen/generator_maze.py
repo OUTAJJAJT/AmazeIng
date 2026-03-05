@@ -3,18 +3,17 @@
 
 import random
 import sys
+from typing import Any, Callable
+
+
+Cell = dict[str, Any]
+Grid = list[list[Cell]]
+
 sys.setrecursionlimit(100000)
 
 
 def get_opposite(direction: str) -> str:
-    """Get the opposite direction.
 
-    Args:
-        direction: One of "top", "right", "bottom", "left".
-
-    Returns:
-        The opposite direction.
-    """
     opposites = {
         "top": "bottom",
         "right": "left",
@@ -24,17 +23,15 @@ def get_opposite(direction: str) -> str:
     return opposites[direction]
 
 
-def carve_passages(grid: list[list[dict]], row: int, col: int,
-                   width: int, height: int, display_callback=None) -> None:
-    """Recursively carve passages through the maze (DFS).
+def carve_passages(
+    grid: Grid,
+    row: int,
+    col: int,
+    width: int,
+    height: int,
+    display_callback: Callable[[Grid], None] | None = None
+) -> None:
 
-    Args:
-        grid: The maze grid.
-        row: Current row.
-        col: Current column.
-        width: Maze width.
-        height: Maze height.
-    """
     grid[row][col]["visited"] = True
 
     directions = ["top", "right", "bottom", "left"]
@@ -56,23 +53,28 @@ def carve_passages(grid: list[list[dict]], row: int, col: int,
                                display_callback)
 
 
-def generate_maze(grid: list[list[dict]], width: int, height: int,
-                  entry: tuple[int, int], display_callback=None) -> None:
-    """Generate maze using recursive backtracking.
+def generate_maze(
+    grid: Grid,
+    width: int,
+    height: int,
+    entry: tuple[int, int],
+    display_callback: Callable[[Grid], None] | None = None
+) -> None:
 
-    Args:
-        grid: The maze grid.
-        width: Maze width.
-        height: Maze height.
-        entry: Starting position (row, col).
-    """
     entry_row, entry_col = entry
     if display_callback is not None:
         display_callback(grid)
     carve_passages(grid, entry_row, entry_col, width, height, display_callback)
 
 
-def can_remove_wall(grid, row, col, direction, width, height):
+def can_remove_wall(
+    grid: Grid,
+    row: int,
+    col: int,
+    direction: str,
+    width: int,
+    height: int
+) -> bool:
 
     if row == 0 and direction == "top":
         return False
@@ -100,11 +102,15 @@ def can_remove_wall(grid, row, col, direction, width, height):
     return True
 
 
-def make_imperfect(grid, width, height, removal_percentage):
+def make_imperfect(
+    grid: Grid,
+    width: int,
+    height: int,
+    removal_percentage: float
+) -> int:
 
     total_cells = width + height
 
-    # Safer wall removal amount
     walls_to_remove = max(1, int((total_cells) * removal_percentage))
 
     removed = 0
@@ -120,7 +126,7 @@ def make_imperfect(grid, width, height, removal_percentage):
         col = random.randint(0, width - 1)
         direction = random.choice(directions)
 
-        if not grid[row][col][direction]:  # skip if already removed
+        if not grid[row][col][direction]:
             continue
 
         if not can_remove_wall(grid, row, col, direction, width, height):
@@ -163,7 +169,7 @@ def get_neighbor(row: int, col: int, direction: str,
     return None
 
 
-def create_grid(width: int, height: int) -> list[list[dict]]:
+def create_grid(width: int, height: int) -> Grid:
     grid = []
 
     for _ in range(height):
@@ -181,14 +187,8 @@ def create_grid(width: int, height: int) -> list[list[dict]]:
     return grid
 
 
-def add_pattern_42(grid: list[list[dict]], width: int, height: int) -> None:
-    """Add ASCII pattern '42' as blocked cells in the maze center.
+def add_pattern_42(grid: Grid, width: int, height: int) -> None:
 
-    Args:
-        grid: The maze grid.
-        width: Maze width.
-        height: Maze height.
-    """
     pattern = [
         "#   ###",
         "#     #",

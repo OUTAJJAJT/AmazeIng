@@ -75,7 +75,7 @@ class ConfigParsing:
         imperfect_percentage: float = 0.5
         import sys
         sys.path.insert(0, '..')
-        from terminal_display import TerminalDisplay  # type: ignore
+        from terminal_display import TerminalDisplay
         try:
             with open(filename, "r") as file:
                 for line in file:
@@ -154,66 +154,66 @@ class ConfigParsing:
                                 else:
                                     seed = value
         except FileNotFoundError:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error(f"Config file '{filename}' not found")
 
         if width is None:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error("Width not found in config file")
             sys.exit(1)
         if height is None:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error("Height not found in config file")
             sys.exit(1)
         if entry is None:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error("Entry not found in config file")
             sys.exit(1)
         if exit is None:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error("Exit not found in config file")
             sys.exit(1)
         if output_file is None:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error("Output file not found in config file")
             sys.exit(1)
 
         if perfect is None:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error("Perfect flag not found in config file")
             sys.exit(1)
 
         if width <= 0:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error(f"Width must be positive, got {width}")
         if height <= 0:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error(f"Height must be positive, got \
 {height}")
 
         max_dimension: int = 23
         if width > max_dimension:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error(f"Width too large (max {max_dimension}), \
 got {width}")
         if height > max_dimension:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error(f"Height too large (max {max_dimension}), \
 got {height}")
         entry_x, entry_y = entry
         exit_x, exit_y = exit
 
         if entry_x < 0 or entry_x >= width or entry_y < 0 or entry_y >= height:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error(f"Entry {entry} is out of bounds (0-\
 {width - 1}, 0-{height - 1})")
         if exit_x < 0 or exit_x >= width or exit_y < 0 or exit_y >= height:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error(f"Exit {exit} is out of bounds\
  (0-{width - 1}, 0-{height - 1})")
 
         if entry == exit:
-            temp_display = TerminalDisplay([[{}]], (0, 0), (0, 0))
+            temp_display = TerminalDisplay([[0]], (0, 0), (0, 0))
             temp_display.show_error("Entry and exit cannot be the same")
 
         return {

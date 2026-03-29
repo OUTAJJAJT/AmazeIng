@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 
+from typing import Any
 
-def reconstruct_path(parent, start, goal):
-    path = []
-    current = goal
+Position = tuple[int, int]
+Cell = dict[str, Any]
+Grid = list[list[Cell]]
+
+
+def reconstruct_path(
+    parent: dict[Position, Position | None],
+    start: Position,
+    goal: Position
+) -> list[Position]:
+    path: list[Position] = []
+    current: Position | None = goal
 
     while current is not None:
         path.append(current)
@@ -13,8 +23,7 @@ def reconstruct_path(parent, start, goal):
     return path
 
 
-def get_valid_neighbors(grid: list[list[dict]],
-                        pos: tuple[int, int]) -> list[tuple[int, int]]:
+def get_valid_neighbors(grid: Grid, pos: Position) -> list[Position]:
     """Get all neighbors accessible from current position (no walls between).
 
     Args:
@@ -46,12 +55,12 @@ def get_valid_neighbors(grid: list[list[dict]],
     return neighbors
 
 
-def find_path(grid: list[list[dict]], start: tuple[int, int],
-              goal: tuple[int, int]):
+def find_path(grid: Grid, start: Position,
+              goal: Position) -> list[Position] | None:
 
     queue = [start]
     visited = {start}
-    parent = {start: None}
+    parent: dict[tuple[int, int], tuple[int, int] | None] = {start: None}
 
     while queue:
         current = queue.pop(0)

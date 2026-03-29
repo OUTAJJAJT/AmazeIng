@@ -1,17 +1,18 @@
 # Maze configuration file
 # Lines starting with '#' are comments
 
-width=17   # Maze width (number of cells)
-HEIGHT=15  # Maze height (number of cells)
+WIDTH=4   # Maze width (number of cells)
+HEIGHT=4  # Maze height (number of cells)
 
-ENTRY=1,9  # Coordinates of maze entrance (x,y)
-exit=13,7   # Coordinates of maze exit (x,y)
+ENTRY=0,2  # Coordinates of maze entrance (x,y)
+EXIT=2,3   # Coordinates of maze exit (x,y)
 
 OUTPUT_file=maze.txt   # Output file name
 
-PErFeCT=True       # Whether the maze is perfect (only one path from ENTRY to EXIT)
+PERFECT=True       # Whether the maze is perfect (only one path from ENTRY to EXIT)
 
 # Optional keys
 SEED=42    # Random seed for reproducibility
-ALGORITHM=recursive_backtracker      # Maze generation algorithm: recursive_backtracker, bfs
+ALGORITHM=recursive_backtracker         # Generate: Recursive Backtracking (DFS) → Creates the maze
+                                        # Solve: Breadth-First Search (BFS) → Finds shortest path through maze
 DISPLAY_MODE=Terminal

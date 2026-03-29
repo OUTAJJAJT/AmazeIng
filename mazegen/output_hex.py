@@ -1,4 +1,12 @@
-def value_of_cell(cell: dict) -> int:
+from typing import Any
+
+
+Position = tuple[int, int]
+Cell = dict[str, Any]
+Grid = list[list[Cell]]
+
+
+def value_of_cell(cell: Cell) -> int:
     value = 0
 
     if cell["top"]:
@@ -13,7 +21,7 @@ def value_of_cell(cell: dict) -> int:
     return value
 
 
-def path_to_directions(path):
+def path_to_directions(path: list[Position]) -> str:
     """Convert a path (list of coordinates) to direction string.
 
     Args:
@@ -40,7 +48,13 @@ def path_to_directions(path):
     return directions
 
 
-def save_maze(grid, entry, exit_pos, path, filename) -> None:
+def save_maze(
+    grid: Grid,
+    entry: Position,
+    exit_pos: Position,
+    path: list[Position] | None,
+    filename: str
+) -> None:
 
     height = len(grid)
     width = len(grid[0])
